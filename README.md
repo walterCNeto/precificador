@@ -1,4 +1,5 @@
 # derivx
+
 ![CI](https://github.com/walterCNeto/precificador/actions/workflows/ci.yml/badge.svg)
 
 Precificador genérico de derivativos via *building blocks*:
