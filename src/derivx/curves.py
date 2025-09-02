@@ -5,9 +5,8 @@ from dataclasses import dataclass
 
 @dataclass
 class PiecewiseFlatCurve:
-    """Curva r(t) piecewise-flat."""
-    times: np.ndarray  # nÃ³s crescentes (ex.: [0.5, 1.0, 2.0])
-    rates: np.ndarray  # taxas contÃ­nuas por trecho
+    times: np.ndarray  # nós crescentes (ex.: [0.5, 1.0, 2.0])
+    rates: np.ndarray  # taxas contínuas por trecho
 
     def __post_init__(self) -> None:
         self.times = np.asarray(self.times, dtype=float)
@@ -22,13 +21,24 @@ class PiecewiseFlatCurve:
         return float(self.rates[idx])
 
     def integral(self, t0: float, t1: float) -> float:
+        """Integra r(t) exatamente para curva piecewise-flat no intervalo [t0, t1]."""
         if t1 <= t0:
             return 0.0
-        grid = np.linspace(t0, t1, 17)  # 16 subintervalos
-        vals = np.array([self.r(x) for x in grid])
-	return float(np.trapezoid(vals, grid))
+        left = float(t0)
+        right = float(t1)
+        # knots: [0, t1, t2, ...]
+        knots = np.concatenate(([0.0], self.times))
+        total = 0.0
+        for i, r in enumerate(self.rates):
+            seg_start = knots[i]
+            seg_end = knots[i + 1] if i + 1 < len(knots) else float("inf")
+            a = max(left, seg_start)
+            b = min(right, seg_end)
+            if b > a:
+                total += float(r) * (b - a)
+            if seg_end >= right:
+                break
+        return total
 
     def df(self, t0: float, t1: float) -> float:
         return math.exp(-self.integral(t0, t1))
-
-

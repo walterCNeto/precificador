@@ -1,9 +1,9 @@
-from derivx import price_from_spec, bs_call_price
+﻿from derivx import price_from_spec, bs_call_price
 
 
 spec = {
 "model": {
-"r": 0.12, # 12% a.a. contínuo
+"r": 0.12, # 12% a.a. contÃ­nuo
 "q": [0.02], # dividend yield
 "sigma": [0.25],
 "corr": [[1.0]],
@@ -22,8 +22,9 @@ spec = {
 
 
 price, se = price_from_spec(spec)
-print(f"MC: {price:.4f} ± {1.96*se:.4f}")
+print(f"MC: {price:.4f} Â± {1.96*se:.4f}")
 
 
 bs = bs_call_price(100.0, 100.0, r=0.12, q=0.02, sigma=0.25, T=1.0)
 print(f"BS: {bs:.4f}")
+
