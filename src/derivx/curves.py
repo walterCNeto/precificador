@@ -26,16 +26,17 @@ class PiecewiseFlatCurve:
             return 0.0
         left = float(t0)
         right = float(t1)
-        # knots: [0, t1, t2, ...]
+        # knots: [0, t1, t2, ...]; o último trecho vai até +inf
         knots = np.concatenate(([0.0], self.times))
+        N = len(self.rates)
         total = 0.0
-        for i, r in enumerate(self.rates):
+        for i in range(N):
             seg_start = knots[i]
-            seg_end = knots[i + 1] if i + 1 < len(knots) else float("inf")
+            seg_end = knots[i + 1] if i < N - 1 else float("inf")
             a = max(left, seg_start)
             b = min(right, seg_end)
             if b > a:
-                total += float(r) * (b - a)
+                total += float(self.rates[i]) * (b - a)
             if seg_end >= right:
                 break
         return total
