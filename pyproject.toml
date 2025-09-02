@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "derivx"
+version = "0.1.0"
+description = "Generic derivative pricer via composable building blocks (MC + LSMC)"
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [{ name = "Walter C Neto" }]
+license = { file = "LICENSE.txt" }
+requires-python = ">=3.9"
+dependencies = [
+  "numpy>=1.22",
+  "scipy>=1.9",
+]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Topic :: Office/Business :: Financial :: Investment",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7",
+  "black>=23",
+  "ruff>=0.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/<seu-usuario>/derivx"
+Issues = "https://github.com/<seu-usuario>/derivx/issues"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["derivx*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
