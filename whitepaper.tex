@@ -1,0 +1,405 @@
+﻿\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{enumitem}
+\geometry{margin=1in}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+
+\lstdefinestyle{pystyle}{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!40!black}\itshape,
+  stringstyle=\color{red!60!black},
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{black!25},
+  tabsize=2
+}
+
+\title{\textbf{derivx} --- Precificador de Derivativos por \emph{Building Blocks}\\
+\large MC/LSMC, PDE Crank--Nicolson, FFT (Heston) e Motor Analítico (BS/Haug/Margrabe) com DSL Declarativa}
+\author{Walter C. Neto (repo: \url{https://github.com/walterCNeto/precificador})}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\texttt{derivx} é uma biblioteca leve e extensível para precificação de derivativos em Python.
+A arquitetura separa: (i) \emph{modelo sob risco-neutro} (gerador de trajetórias),
+(ii) \emph{numerário/curva} (desconto determinístico), (iii) \emph{payoffs} como funcionais de trajetória (PF) componíveis,
+e (iv) \emph{política de exercício} (Europeu/Bermudano/Americano via LSMC).
+Uma DSL declarativa (JSON/dict) permite especificar produtos sem escrever código novo.
+Inclui backends MC (GBM/Heston), PDE 1D (Crank--Nicolson) para vanillas, FFT (Carr--Madan) para Heston europeu
+e um \textbf{motor analítico} para fórmulas fechadas (Black--Scholes, digitais de Haug, opções \emph{gap}, e troca de Margrabe).
+Exemplos, testes e CI acompanham o pacote. Este documento traz teoria, API, guias de uso e exemplos.
+\end{abstract}
+
+\tableofcontents
+
+\section{Instalação e \emph{quick start}}
+\begin{verbatim}
+# Windows PowerShell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+pytest -q
+python examples/smoke.py
+\end{verbatim}
+
+\paragraph{Exemplo mínimo (via DSL).}
+\begin{lstlisting}[style=pystyle]
+from derivx import price_from_spec, bs_call_price
+
+spec = {
+  "engine": "mc",
+  "model": {"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
+  "grid": {"T": 1.0, "steps": 128},
+  "S0": [100.0],
+  "product": {"style":"european","type":"european_call","asset":0,"K":100.0},
+  "n_paths": 80_000, "seed": 42,
+}
+p, se = price_from_spec(spec)
+print("MC:", p, "±", 1.96*se)
+print("BS:", bs_call_price(100, 100, r=0.05, q=0.0, sigma=0.2, T=1.0))
+\end{lstlisting}
+
+\section{Arquitetura (visão geral)}
+\begin{itemize}[leftmargin=1.2em]
+\item \textbf{Curva (numerário).} \texttt{PiecewiseFlatCurve} implementa $r(t)$ \emph{piecewise-flat} com desconto
+$DF(t_0,t_1)=\exp\{-\int_{t_0}^{t_1} r(u)\,du\}$ exato por trechos.
+\item \textbf{Modelos sob $\mathbb{Q}$.}
+GBM multiativo (\texttt{RiskNeutralGBM}) com $q_i(t)$, $\sigma_i(t)$ e correlação; Heston para europeias (MC/FFT).
+\item \textbf{Funcionais de trajetória (PF).} Utilitários vetorizados: $S_{t_k}$, máximos/mínimos corridos, médias, barreiras, cestas.
+Payoffs são funções \verb|paths -> np.ndarray|.
+\item \textbf{Motores numéricos.}
+\emph{MC}: simulação e estimação $E_{\mathbb Q}[X]$ (antitético e CV opcionais).
+\emph{PDE CN}: 1D para calls/puts; exercício americano via projeção $\max$ por passo.
+\emph{FFT (Heston)}: Carr--Madan ($\alpha,N,\eta$).
+\textbf{\emph{Analítico}}: fórmulas fechadas para BS (vanillas), \emph{digitais} (cash/asset-or-nothing), \emph{gap} (Haug) e \emph{exchange} (Margrabe).
+\item \textbf{Exercício (LSMC).} \texttt{ExerciseSpec} + \texttt{lsmc.price}: regressão do valor de continuação em features (por padrão $\log S$,
+base polinomial até grau 2 + cruzados). Implementação com desconto por janela e cross-fit A/B.
+\item \textbf{DSL.} \texttt{price\_from\_spec(spec)} mapeia um dicionário JSON para engine, grade e produto.
+\emph{Engines}: ``\texttt{mc}'', ``\texttt{pde}'', ``\texttt{fft}'', ``\texttt{analytic}'' ou ``\texttt{auto}'' (tenta analítico e cai para MC).
+\end{itemize}
+
+\section{Base teórica}
+
+\subsection{Precificação sob $\mathbb{Q}$ e numeraire}
+Seja $B(t)=\exp\{\int_0^t r(u)\,du\}$ o banco. Para payoff $X$ em $T$:
+\[
+\Pi_0=\mathbb E^{\mathbb Q}\!\left[\frac{X}{B(T)}\right]=DF(0,T)\,\mathbb E^{\mathbb Q}[X].
+\]
+No MC estimamos $\hat \Pi_0 = DF(0,T)\,\overline{X}$ com erro-padrão 
+$\mathrm{SE}=s_X/\sqrt{N}$ e IC 95\% como $\pm 1.96\,\mathrm{SE}$.
+
+\subsection{GBM multiativo e simulação exata}
+Para $i=1,\dots,D$:
+\[
+\frac{dS_i}{S_i}=(r(t)-q_i(t))\,dt+\sigma_i(t)\,dW_i^{\mathbb Q}(t),\quad
+\mathrm{Cov}(dW_i,dW_j)=\rho_{ij}\,dt.
+\]
+No passo $\Delta t$: 
+\[
+S_{t+\Delta t} = S_t\exp\!\Big((r-q-\tfrac12\sigma^2)\Delta t + \sigma\sqrt{\Delta t}\,Z\Big),
+\]
+com $Z\sim \mathcal N(0,\rho)$ via Cholesky. Antitético usa $Z$ e $-Z$.
+
+\subsection{LSMC (Longstaff--Schwartz)}
+Datas de exercício $\mathcal T=\{t_{k_j}\}$; payoff imediato $g(S_{t_k})$.
+Define-se o valor de continuação:
+\[
+C_k(s)=\mathbb E\!\big[\,DF(t_k,t_{k+1})\,V_{k+1}\,\big|\,S_{t_k}=s\big].
+\]
+Algoritmo (retropropagação em janelas, regressão apenas no ITM, desconto correto e cross-fit A/B).
+
+\subsection{PDE 1D Crank--Nicolson (vanillas)}
+PDE de Black--Scholes: 
+\[
+\partial_t V + (r-q)S\,\partial_S V + \tfrac12\sigma^2 S^2 \partial^2_{SS}V - rV = 0.
+\]
+CN $\Rightarrow$ sistema tridiagonal por passo; americano via projeção $\max$.
+
+\subsection{FFT (Heston europeu)}
+Carr--Madan: preço como transformada de Fourier amortecida ($\alpha>0$), discretizada com $N,\eta$ e FFT.
+
+\subsection{Motor Analítico (BS/Haug/Margrabe)}
+\paragraph{BS (vanillas).} Fórmulas fechadas de call/put padrão.
+\paragraph{Digitais de Haug.}
+\emph{Cash-or-nothing}: $e^{-rT}\Phi(d_2)$ (call) e $e^{-rT}\Phi(-d_2)$ (put).
+\emph{Asset-or-nothing}: $S_0 e^{-qT}\Phi(d_1)$ (call) e $S_0 e^{-qT}\Phi(-d_1)$ (put).
+\paragraph{Opções \emph{gap}.} \emph{Gap call}: $S_0 e^{-qT}\Phi(d_1(K_2)) - K_1 e^{-rT}\Phi(d_2(K_2))$.
+\paragraph{Exchange (Margrabe).}
+Chamar $S_1$ por $S_2$ com vol efetiva $\sigma_{ex}=\sqrt{\sigma_1^2+\sigma_2^2-2\rho\sigma_1\sigma_2}$.
+
+\section{Como usar a biblioteca}
+
+\subsection{Camada 1 — API direta (curvas, modelos, motores)}
+\begin{lstlisting}[style=pystyle]
+import numpy as np
+from derivx import PiecewiseFlatCurve, RiskNeutralGBM, MonteCarloEngine
+
+r_curve = PiecewiseFlatCurve(np.array([1e-8]), np.array([0.05]))
+model = RiskNeutralGBM(r_curve, q_funcs=[0.0], sigma_funcs=[0.2], corr=None)
+eng = MonteCarloEngine(model)
+
+times = np.linspace(0.0, 1.0, 128+1)
+S0 = [100.0]
+
+from derivx import PF, relu
+payoff = lambda paths: relu(PF.terminal(paths, 0) - 100.0)
+
+price, se = eng.price(payoff, S0, times, n_paths=80_000, seed=42)
+print(price, "±", 1.96*se)
+\end{lstlisting}
+
+\paragraph{Exercício via LSMC.}
+\begin{lstlisting}[style=pystyle]
+from derivx import ExerciseSpec
+
+def imm_put(paths, k):
+    St = PF.at_time(paths, 0, k)
+    return relu(100.0 - St)
+
+spec = ExerciseSpec(exercise_idx=[16,32,48,64], immediate_payoff=imm_put)
+price, se = eng.price_exercisable(spec, S0, times, n_paths=150_000, seed=7)
+\end{lstlisting}
+
+\subsection{Camada 2 — DSL declarativa (\texttt{price\_from\_spec})}
+\begin{lstlisting}[style=pystyle]
+from derivx import price_from_spec
+
+spec = {
+  "engine":"mc",  # "mc" | "pde" | "fft" | "analytic" | "auto"
+  "model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
+  "grid":{"T":1.0,"steps":128},
+  "S0":[100.0],
+  "product":{"style":"european","type":"european_call","asset":0,"K":100.0},
+  "n_paths":80_000,"seed":7
+}
+price, se = price_from_spec(spec)
+\end{lstlisting}
+
+\paragraph{Chaves suportadas (ampliadas).}
+\begin{itemize}[leftmargin=1.2em]
+\item \texttt{engine}: \verb|"mc"|, \verb|"pde"|, \verb|"fft"|, \verb|"analytic"|, \verb|"auto"|.
+\item \texttt{model}:
+\begin{itemize}[nosep]
+\item GBM: \verb|{"name":"gbm","r":...,"q":...,"sigma":...,"corr":[[...]...]}|.
+\item Heston: \verb|{"name":"heston","r":...,"q":...,"kappa":...,"theta":...,"xi":...,"rho":...,"v0":...}|.
+\end{itemize}
+\item \texttt{product}:
+\begin{itemize}[nosep]
+\item Vanilla: \verb|european_call|, \verb|european_put|.
+\item Path-dep.: \verb|asian_arith_call|, \verb|up_and_out_call|.
+\item Digitais (analítico/MC): \verb|cash_or_nothing_call|, \verb|cash_or_nothing_put|,
+\verb|asset_or_nothing_call|, \verb|asset_or_nothing_put|.
+\item Gap (analítico/MC): \verb|gap_call|, \verb|gap_put| com \verb|K1| (strike de pagamento) e \verb|K2| (gatilho).
+\item Exchange (Margrabe): \verb|exchange_call| com \verb|asset_long| e \verb|asset_short|.
+\item Exercício: \verb|{"style":"bermudan","type":"european_put","exercise_every":16}|.
+\end{itemize}
+\item Parâmetros de motor: MC (\verb|n_paths|, \verb|steps|, \verb|seed|), PDE (\verb|NS|, \verb|NT|, \verb|Smax_mult|),
+FFT (\verb|alpha|, \verb|N|, \verb|eta|).
+\end{itemize}
+
+\subsection{Precisão \& Performance: \emph{knobs} práticos}
+\begin{center}
+\begin{tabular}{@{}llp{7.5cm}@{}}
+\toprule
+Backend & Parâmetro & Efeito prático \\
+\midrule
+MC & \texttt{n\_paths} & SE $\propto 1/\sqrt{N}$; custo linear. \\
+MC & \texttt{steps} & Menor bias temporal; custo $\propto$ paths $\times$ steps. \\
+PDE & \texttt{NS, NT} & Convergência $\mathcal O(\Delta t + \Delta S^2)$. \\
+PDE & \texttt{Smax\_mult} & Domínio $[0,S_{\max}]$ (5–7$\times K$ é bom começo). \\
+FFT & $\alpha$ & Damping (1–2 típico). \\
+FFT & $N,\eta$ & Resolução em frequência/strike. \\
+Analítico & --- & Exato sob as hipóteses; útil p/ validação e \emph{benchmarks}. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Validação, testes e reprodutibilidade}
+\begin{itemize}[leftmargin=1.2em]
+\item \textbf{Consistência BS}: MC (GBM) $\approx$ Black--Scholes (tolerância por SE).
+\item \textbf{PDE vs BS}: put europeu CN $\approx$ BS; americano PDE $\ge$ europeu.
+\item \textbf{Heston}: MC $\approx$ FFT (Carr--Madan).
+\item \textbf{Haug (Digitais/Gap) e Margrabe}: motor analítico idêntico às fórmulas; MC reproduz dentro da SE.
+\end{itemize}
+\begin{verbatim}
+# Windows
+$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD="1"
+python -m pytest -q
+\end{verbatim}
+
+\section{Exemplos práticos (fim-a-fim)}
+
+\subsection{(E1) Europeu: MC vs Black--Scholes}
+\begin{lstlisting}[style=pystyle]
+from derivx import price_from_spec, bs_call_price
+S0=K=100.0; r=0.05; q=0.0; sigma=0.2; T=1.0
+spec={"engine":"mc","model":{"name":"gbm","r":r,"q":q,"sigma":sigma},
+      "grid":{"T":T,"steps":128},"S0":[S0],
+      "product":{"style":"european","type":"european_call","asset":0,"K":K},
+      "n_paths":80_000,"seed":42}
+pmc,se = price_from_spec(spec)
+pbs = bs_call_price(S0,K,r,q,sigma,T)
+print(f"MC={pmc:.4f} ± {1.96*se:.4f} | BS={pbs:.4f}")
+\end{lstlisting}
+
+\subsection{(E2) PDE: put europeu vs americano}
+\begin{lstlisting}[style=pystyle]
+from derivx import price_from_spec
+euro={"engine":"pde","model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
+      "grid":{"T":1.0},"S0":[100.0],
+      "product":{"style":"european","type":"european_put","asset":0,"K":100.0},
+      "NS":800,"NT":800,"Smax_mult":5.0}
+amer={**euro,"product":{"style":"american","type":"european_put","asset":0,"K":100.0}}
+pe,_ = price_from_spec(euro); pa,_ = price_from_spec(amer)
+print(f"PDE euro={pe:.4f}  PDE amer={pa:.4f}  (amer >= euro)")
+\end{lstlisting}
+
+\subsection{(E3) Barreira up\&out e monotonia}
+\begin{lstlisting}[style=pystyle]
+base={"engine":"mc","model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
+      "grid":{"T":1.0,"steps":128},"S0":[100.0],"n_paths":100_000,"seed":7}
+van,_  = price_from_spec({**base,"product":{"style":"european","type":"european_call","asset":0,"K":100.0}})
+uo130,_= price_from_spec({**base,"product":{"style":"european","type":"up_and_out_call","asset":0,"K":100.0,"barrier":130.0}})
+uo140,_= price_from_spec({**base,"product":{"style":"european","type":"up_and_out_call","asset":0,"K":100.0,"barrier":140.0}})
+print(f"UO130={uo130:.4f} <= UO140={uo140:.4f} <= Vanilla={van:.4f}")
+\end{lstlisting}
+
+\subsection{(E4) Asiática aritmética $\le$ vanilla}
+\begin{lstlisting}[style=pystyle]
+asian,_= price_from_spec({**base,"product":{"style":"european","type":"asian_arith_call","asset":0,"K":100.0}})
+print(f"Asian={asian:.4f} <= Vanilla={van:.4f}")
+\end{lstlisting}
+
+\subsection{(E5) Bermudana (LSMC): frequência de exercício}
+\begin{lstlisting}[style=pystyle]
+def berm(ex_every):
+  spec={"engine":"mc","model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
+        "grid":{"T":1.0,"steps":256},"S0":[100.0],
+        "product":{"style":"bermudan","type":"european_put","asset":0,"K":100.0,"exercise_every":ex_every},
+        "n_paths":120_000,"seed":7}
+  return price_from_spec(spec)
+for ex in (8,16,32):
+  p,se = berm(ex)
+  print(f"ex_every={ex:>2}: {p:.4f} ± {1.96*se:.4f}")
+\end{lstlisting}
+
+\subsection{(E6) Heston: FFT vs MC}
+\begin{lstlisting}[style=pystyle]
+common={"name":"heston","r":0.05,"q":0.0,"kappa":1.5,"theta":0.04,"xi":0.5,"rho":-0.7,"v0":0.04}
+fft={"engine":"fft","model":common,"grid":{"T":1.0},"S0":[100.0],
+     "product":{"style":"european","type":"european_call","asset":0,"K":100.0},
+     "alpha":1.5,"N":4096,"eta":0.25}
+mc={"engine":"mc","model":common,"grid":{"T":1.0,"steps":512},"S0":[100.0],
+    "product":{"style":"european","type":"european_call","asset":0,"K":100.0},
+    "n_paths":200_000,"seed":7}
+p_fft,_=price_from_spec(fft); p_mc,se=price_from_spec(mc)
+print(f"FFT={p_fft:.4f} | MC={p_mc:.4f} ± {1.96*se:.4f}")
+\end{lstlisting}
+
+\subsection{(E7) Basket 2D (GBM correlacionado)}
+\begin{lstlisting}[style=pystyle]
+spec={"engine":"mc",
+      "model":{"name":"gbm","r":0.05,"q":[0.01,0.03],"sigma":[0.20,0.30],
+               "corr":[[1.0,0.5],[0.5,1.0]]},
+      "grid":{"T":2.0,"steps":80},"S0":[100.0,120.0],
+      "product":{"style":"european","type":"basket_call","weights":[0.5,0.5],"K":110.0},
+      "n_paths":100_000,"seed":3}
+p,se=price_from_spec(spec)
+print(p, "±", 1.96*se)
+\end{lstlisting}
+
+\subsection{(E8) Greeks por \emph{bump \& revalue} (CRN)}
+\begin{lstlisting}[style=pystyle]
+import numpy as np
+base={"engine":"mc","model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
+      "grid":{"T":1.0,"steps":256},"S0":[100.0],
+      "product":{"style":"european","type":"european_call","asset":0,"K":100.0},
+      "n_paths":120_000,"seed":11}
+def price(spec): from derivx import price_from_spec; return price_from_spec(spec)[0]
+h=1.0
+p0=price(base)
+pU=price({**base,"S0":[100.0+h]})
+pD=price({**base,"S0":[100.0-h]})
+delta=(pU-pD)/(2*h); gamma=(pU-2*p0+pD)/(h*h)
+print("Delta~",delta,"Gamma~",gamma)
+\end{lstlisting}
+
+\subsection{(E9) Digitais de Haug (analítico vs MC)}
+\begin{lstlisting}[style=pystyle]
+# Digital cash-or-nothing call (analítico)
+specA={"engine":"analytic","model":{"r":0.05,"q":[0.0],"sigma":[0.2]},
+       "grid":{"T":1.0},"S0":[100.0],
+       "product":{"style":"european","type":"cash_or_nothing_call","asset":0,"K":100.0,"cash":1.0}}
+pa,_=price_from_spec(specA)
+
+# Mesmo payoff via MC
+specM={"engine":"mc","model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
+       "grid":{"T":1.0,"steps":256},"S0":[100.0],
+       "product":{"style":"european","type":"cash_or_nothing_call","asset":0,"K":100.0,"cash":1.0},
+       "n_paths":200_000,"seed":11}
+pm,se=price_from_spec(specM)
+print(f"Analytic={pa:.6f} | MC={pm:.6f} ± {1.96*se:.6f}")
+\end{lstlisting}
+
+\subsection{(E10) Gap (Haug) e (E11) Exchange (Margrabe)}
+\begin{lstlisting}[style=pystyle]
+# Gap call: K1 (pagamento), K2 (gatilho)
+gap={"engine":"analytic","model":{"r":0.05,"q":[0.0],"sigma":[0.2]},
+     "grid":{"T":1.0},"S0":[100.0],
+     "product":{"style":"european","type":"gap_call","asset":0,"K1":95.0,"K2":100.0}}
+pg,_=price_from_spec(gap); print("Gap call:", pg)
+
+# Margrabe exchange: S1 por S2
+ex={"engine":"analytic",
+    "model":{"r":0.05,"q":[0.01,0.03],"sigma":[0.20,0.30],
+             "corr":[[1.0,0.5],[0.5,1.0]]},
+    "grid":{"T":1.0},"S0":[100.0,120.0],
+    "product":{"style":"european","type":"exchange_call","asset_long":0,"asset_short":1}}
+pm,_=price_from_spec(ex); print("Exchange (Margrabe):", pm)
+\end{lstlisting}
+
+\section{Estrutura do repositório (resumo)}
+\begin{verbatim}
+src/derivx/
+  curves.py           # PiecewiseFlatCurve (df, integr. por trecho)
+  models/gbm.py       # RiskNeutralGBM (paths; df via curva)
+  engine/montecarlo.py
+  engine/pde.py       # CN 1D vanillas (euro/amer)
+  engine/fft.py       # Heston FFT (Carr-Madan)
+  exercise/lsmc.py    # LSMC genérico (desconto por janela, cross-fit)
+  analytic/           # Fórmulas fechadas (BS/Haug/Margrabe)
+    __init__.py, bs.py, haug.py
+  payoffs/core.py     # PF utilitários (terminal, média, etc.)
+  payoffs/extra.py    # Digitais, gap, exchange; DSL helpers
+  dsl/spec.py         # mapeia dict -> engine/produto
+tests/                # sanity, propriedades e referências (Haug/Margrabe)
+examples/             # scripts reprodutíveis
+\end{verbatim}
+
+\section{Licença e aviso}
+MIT. Uso acadêmico/educacional; valide premissas, calibração e risco de modelo antes de produção.
+
+\section*{Referências}
+\noindent
+Black, F.; Scholes, M. (1973) \emph{The Pricing of Options and Corporate Liabilities}.\\
+Longstaff, F.; Schwartz, E. (2001) \emph{Valuing American Options by Simulation}.\\
+Carr, P.; Madan, D. (1999) \emph{Option Valuation Using the FFT}.\\
+Heston, S. (1993) \emph{A Closed-Form Solution for Options with Stochastic Volatility}.\\
+Margrabe, W. (1978) \emph{The Value of an Option to Exchange One Asset for Another}.\\
+Haug, E.G. (2006) \emph{The Complete Guide to Option Pricing Formulas}.
+\end{document}
