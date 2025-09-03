@@ -1,0 +1,253 @@
+diff --git a/README.md b/README.md
+index 3b18c0d..b1c7f7a 100644
+--- a/README.md
++++ b/README.md
+@@ -1,10 +1,238 @@
+-# derivx
+-
+-![CI](https://github.com/walterCNeto/precificador/actions/workflows/ci.yml/badge.svg)
+-
+-Precificador genérico de derivativos via *building blocks*:
+-- **Modelo sob Q** (GBM multiativo com correlação, r(t), q_i(t), sigma_i(t))
+-- **Numerário** piecewise-flat (desconto determinístico)
+-- **Payoffs componíveis** (PF: terminal, média, máx/mín, basket, barreira, etc.)
+-- **Exercício** Europeu ou Bermudano/Americano (LSMC)
+-- **DSL** declarativa (dict/JSON) para montar produto e precificar
+-
+-
+-## Instalação (dev)
+-```bash
+-python -m venv .venv && source .venv/bin/activate # (Windows: .venv\Scripts\activate)
+-pip install -e .[dev]
+-```
++# derivx
++
++[![CI](https://github.com/walterCNeto/precificador/actions/workflows/ci.yml/badge.svg)](https://github.com/walterCNeto/precificador/actions/workflows/ci.yml)
++
++Precificação genérica de derivativos via *building blocks*:
++
++- **Motores numéricos**: Monte Carlo (GBM/Heston), PDE 1D (Crank–Nicolson), FFT (Carr–Madan/Heston)  
++- **Curvas**: numerário/desconto determinístico *piecewise-flat*  
++- **Payoffs componíveis**: europeu (call/put), asiático aritmético, barreira (up-and-out), bermudano (LSMC)  
++- **Exercício**: europeu e bermudano/americano (LSMC)  
++- **DSL**: especificação declarativa (dict/JSON) para montar produto e precificar  
++- **Utilitários**: fórmula fechada de Black–Scholes, checagens e exemplos
++
++> ✅ Veja também **VALIDATION.md** com um snapshot de validações (BS, PDE, MC, Heston FFT etc).
++
++---
++
++## Requisitos
++
++- Python **3.9+** (testado em 3.11+)
++- NumPy, SciPy (instalados pelo `pip` abaixo)
++
++---
++
++## Instalação (dev)
++
++```bash
++# Unix/macOS
++python -m venv .venv && source .venv/bin/activate
++pip install -e ".[dev]"
++```
++
++```powershell
++# Windows PowerShell
++python -m venv .venv
++.\.venv\Scripts\Activate.ps1
++pip install -e ".[dev]"
++```
++
++> **Dica (Windows):** se a ativação do venv reclamar de “execução de scripts desabilitada”, use:
++> ```powershell
++> Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
++> ```
++
++---
++
++## Comece rápido
++
++### 1) Black–Scholes (analítico)
++
++```python
++from derivx import bs_call_price
++price = bs_call_price(S0=100, K=100, r=0.05, q=0.0, sigma=0.2, T=1.0)
++print(price)  # ~10.4506
++```
++
++### 2) Monte Carlo (GBM) – europeu
++
++```python
++from derivx import price_from_spec
++
++spec = {
++  "engine": "mc",
++  "model": {"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
++  "grid": {"T":1.0, "steps":128},
++  "S0": [100.0],
++  "product": {"style":"european","type":"european_call","asset":0,"K":100.0},
++  "n_paths": 80_000,
++  "seed": 42
++}
++price, se = price_from_spec(spec)
++print(price, se)
++```
++
++### 3) PDE (Crank–Nicolson) – put europeu/americano
++
++```python
++from derivx import price_from_spec
++
++# Europeu
++euro = {
++  "engine":"pde",
++  "model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
++  "grid":{"T":1.0},
++  "S0":[100.0],
++  "product":{"style":"european","type":"european_put","asset":0,"K":100.0},
++  "NS":800,"NT":800,"Smax_mult":5.0
++}
++p_euro, _ = price_from_spec(euro)
++
++# Americano
++amer = {**euro, "product":{"style":"american","type":"european_put","asset":0,"K":100.0}}
++p_amer, _ = price_from_spec(amer)
++print(p_euro, p_amer)   # amer >= euro
++```
++
++### 4) Heston – FFT (Carr–Madan) e MC
++
++```python
++from derivx import price_from_spec
++
++heston = {"name":"heston","r":0.05,"q":0.0,"kappa":1.5,"theta":0.04,"xi":0.5,"rho":-0.7,"v0":0.04}
++
++spec_fft = {
++  "engine":"fft","model":heston,"grid":{"T":1.0},"S0":[100.0],
++  "product":{"style":"european","type":"european_call","asset":0,"K":100.0},
++  "alpha":1.5,"N":4096,"eta":0.25
++}
++p_fft, _ = price_from_spec(spec_fft)
++
++spec_mc = {
++  "engine":"mc","model":heston,"grid":{"T":1.0,"steps":512},"S0":[100.0],
++  "product":{"style":"european","type":"european_call","asset":0,"K":100.0},
++  "n_paths":200_000,"seed":7
++}
++p_mc, se = price_from_spec(spec_mc)
++print(p_fft, p_mc, se)
++```
++
++---
++
++## DSL (especificação declarativa)
++
++A função central é:
++
++```python
++from derivx import price_from_spec
++price, se = price_from_spec(spec_dict)
++```
++
++### Campos principais do `spec_dict`
++
++- `engine`: `"mc"`, `"pde"` ou `"fft"`
++- `model`:
++  - `{"name":"gbm","r":..., "q":..., "sigma":...}`
++  - `{"name":"heston","r":...,"q":...,"kappa":...,"theta":...,"xi":...,"rho":...,"v0":...}`
++- `grid`: `{"T": maturidade_em_anos, "steps": N_de_passos}` (para MC; PDE usa só `T`)
++- `S0`: lista com preços iniciais (para um ativo, use `[100.0]`)
++- `product`:
++  - Europeu vanilla: `{"style":"european","type":"european_call|european_put","asset":0,"K":100.0}`
++  - Asiático aritm.: `{"style":"european","type":"asian_arith_call","asset":0,"K":100.0}`
++  - Barreira up&out: `{"style":"european","type":"up_and_out_call","asset":0,"K":100.0,"barrier":130.0}`
++  - Bermudano (LSMC): `{"style":"bermudan","type":"european_put","asset":0,"K":100.0,"exercise_every":16}`
++- Parâmetros do motor:
++  - **MC**: `n_paths`, `seed`
++  - **PDE**: `NS`, `NT`, `Smax_mult`
++  - **FFT** (Heston): `alpha`, `N`, `eta`
++
++---
++
++## API rápida
++
++- `bs_call_price(S0, K, r, q, sigma, T) -> float`  
++  Call de Black–Scholes (put via paridade).
++
++- `price_from_spec(spec: dict) -> (price: float, se: float)`  
++  Avalia a especificação.
++
++- `PiecewiseFlatCurve(times: np.ndarray, rates: np.ndarray)`  
++  Curva *piecewise-flat* (ex.: para `r(t)`/`q(t)`), com `.df(t0, t1)`.
++
++> Exemplos completos em `examples/`:  
++> `smoke.py`, `validate_simple.py`, `heston_european.py`, `american_put_pde.py`, `fft_heston_call.py`.
++
++---
++
++## Validação
++
++- **VALIDATION.md** contém saídas de referência (BS, PDE vs BS, relações lógicas de barrier/Asian, Heston MC vs FFT).
++- Testes automatizados (`tests/`) cobrem consistência (BS), propriedades de monotonia (barreira, Bermudan), PDE vs BS etc.
++
++---
++
++## Rodando os testes
++
++```powershell
++# Windows PowerShell
++.\.venv\Scripts\Activate.ps1
++$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD = "1"  # evita plugins externos interferirem
++python -m pytest -q
++```
++
++```bash
++# Unix/macOS
++source .venv/bin/activate
++PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
++```
++
++---
++
++## Dicas & Troubleshooting
++
++- **PowerShell / ativação do venv**  
++  Use `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` se a ativação for bloqueada.
++
++- **PyTest carregando plugins do sistema**  
++  Use `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` como mostrado acima.
++
++- **Reprodutibilidade em MC**  
++  Fixe `seed` e reporte `± 1.96*se` (intervalo de confiança ~95%).
++
++- **PDE estável**  
++  Aumente `NS/NT` e `Smax_mult` (ex.: `NS=NT=1200`, `Smax_mult=6.0`) para maior acurácia, com custo computacional maior.
++
++---
++
++## Roadmap (curto prazo)
++
++- Cestas e multi-ativo (GBM correlacionado)
++- Mais tipos de barreira (down-and-out/in), lookbacks
++- Vol local / volatilidade implícita por smile (LV/SVI)
++- Documentação em LaTeX (teoria + guias) expandida
++
++---
++
++## Contribuindo
++
++Issues e PRs são muito bem-vindos.  
++Padrões: `black`, `ruff`, `pytest`.
++
++```bash
++ruff check .
++black .
++python -m pytest -q
++```
++
++---
++
++## Licença
++
++MIT — veja `LICENSE`.

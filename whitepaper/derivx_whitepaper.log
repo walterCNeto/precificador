@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.8.11)  2 SEP 2025 16:53
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.8.11)  3 SEP 2025 09:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -454,8 +454,8 @@ Package: enumitem 2019/06/20 v3.9 Customized lists
 \enit@count@id=\count304
 \enitdp@description=\count305
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 15.
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 35
+Package hyperref Info: Option `colorlinks' set `true' on input line 14.
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 34
 .
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -465,28 +465,28 @@ ftex.def
 File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count306
 \l__pdf_internal_box=\box57
-)
-No file derivx_whitepaper.aux.
+) (derivx_whitepaper.aux)
 \openout1 = `derivx_whitepaper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 35.
-LaTeX Font Info:    ... okay on input line 35.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -547,63 +547,69 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring ON on input line 35.
+Package hyperref Info: Link coloring ON on input line 34.
+ (derivx_whitepaper.out) (derivx_whitepaper.out)
 \@outlinefile=\write3
 \openout3 = `derivx_whitepaper.out'.
 
 \c@lstlisting=\count313
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 3
-7.
- (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
+6.
+
+(C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 3
-7.
+6.
 
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-37.
+36.
 
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-37.
+36.
 
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 37.
+(Font)              <12> on input line 36.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 37.
+(Font)              <8> on input line 36.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 37.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 37.
+(Font)              <6> on input line 36.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 36.
 
 
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 37.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 36.
 
 
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3
-7.
+6.
 
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
+No file derivx_whitepaper.toc.
+\tf@toc=\write4
+\openout4 = `derivx_whitepaper.toc'.
+
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2023/02/27 1.9 listings language file
 )
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 58.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 61.
 
 ! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
@@ -611,8 +617,8 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.68 print("MC:", price, "±",
-                               1.96*se)
+l.72 print("MC:", p, "±",
+                           1.96*se)
 ? 
 
 ! LaTeX Error: Invalid UTF-8 byte "B1.
@@ -621,24 +627,17 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.68 print("MC:", price, "±",
-                               1.96*se)
+l.72 print("MC:", p, "±",
+                           1.96*se)
 ? 
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 7
-4.
+8.
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 74.
-
-Overfull \hbox (10.51569pt too wide) in paragraph at lines 81--83
-\T1/lmr/m/it/10.95 run-ning\T1/lmr/m/n/10.95 , m�-dias, ces-tas, e bar-reiras t
-o-cadas. Pay-offs s�o ape-nas fun��es [][]\T1/lmtt/m/n/10.95 paths -> np.ndarra
-y[]\T1/lmr/m/n/10.95 . 
- []
-
-[1
+(Font)              <10.95> on input line 78.
+ [1
 
 {C:/Users/Lenovo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Len
 ovo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/Lenovo
@@ -647,26 +646,13 @@ ppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/Lenovo/
 AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Users/Lenovo/App
 Data/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Users/Lenovo/Ap
 pData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
-Overfull \hbox (16.41324pt too wide) in paragraph at lines 85--87
-[]\T1/lmr/bx/n/10.95 Exerc�cio (LSMC): \T1/lmtt/m/n/10.95 MonteCarloEngine.pric
-e_exercisable \T1/lmr/m/n/10.95 im-ple-menta Longstaff--Schwartz:
- []
 
-
-Overfull \hbox (33.52187pt too wide) in paragraph at lines 87--89
-\T1/lmr/m/n/10.95 (\T1/lmtt/m/n/10.95 european/basket/asian/up-and-out\T1/lmr/m
-/n/10.95 ; \T1/lmtt/m/n/10.95 bermudan/american \T1/lmr/m/n/10.95 via \T1/lmtt/
-m/n/10.95 exercise_every\T1/lmr/m/n/10.95 /\T1/lmtt/m/n/10.95 exercise_idx\T1/l
-mr/m/n/10.95 ). 
- []
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 95.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 92.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 92.
+(hyperref)                removing `math shift' on input line 95.
 
 [2]
 
@@ -676,7 +662,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.140 print(price, "±",
+l.183 print(price, "±",
                          1.96*se)
 ? 
 
@@ -686,552 +672,136 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.140 print(price, "±",
+l.183 print(price, "±",
                          1.96*se)
 ? 
-
-Overfull \hbox (7.97516pt too wide) in paragraph at lines 178--182
-[]\T1/lmtt/m/n/10.95 product\T1/lmr/m/n/10.95 : \T1/lmtt/m/n/10.95 style $\OMS/
-lmsy/m/n/10.95 2$ \T1/lmr/m/n/10.95 {\T1/lmtt/m/n/10.95 european\T1/lmr/m/n/10.
-95 , \T1/lmtt/m/n/10.95 bermudan\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 american
-\T1/lmr/m/n/10.95 }; \T1/lmtt/m/n/10.95 type $\OMS/lmsy/m/n/10.95 2$ \T1/lmr/m/
-n/10.95 {\T1/lmtt/m/n/10.95 european_call\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95
- european_put\T1/lmr/m/n/10.95 ,
- []
-
-
-Overfull \hbox (199.93951pt too wide) in paragraph at lines 178--182
-\T1/lmtt/m/n/10.95 asian_arith_call\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 up_an
-d_out_call\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 basket_call\T1/lmr/m/n/10.95 }
-. Bermu-dana/amer-i-cana usa \T1/lmtt/m/n/10.95 exercise_every\T1/lmr/m/n/10.95
- /\T1/lmtt/m/n/10.95 exercise_idx\T1/lmr/m/n/10.95 /\T1/lmtt/m/n/10.95 exercise
-_times\T1/lmr/m/n/10.95 . 
- []
-
 [3]
-Overfull \hbox (12.20148pt too wide) in paragraph at lines 206--208
- []\T1/lmr/bx/n/10.95 Novos pay-offs.[] \T1/lmr/m/n/10.95 Crie fun��es [][]\T1/
-lmtt/m/n/10.95 paths -> array []\T1/lmr/m/n/10.95 com-bi-nando PF (\T1/lmtt/m/n
-/10.95 running_max\T1/lmr/m/n/10.95 , \T1/lmtt/m/n/10.95 average\T1/lmr/m/n/10.
-95 , \T1/lmtt/m/n/10.95 basket\T1/lmr/m/n/10.95 ,
- []
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 200.
 
 
-Overfull \hbox (1.19992pt too wide) in paragraph at lines 216--217
-[]\T1/lmr/bx/n/10.95 Monotonicidades e or-dens\T1/lmr/m/n/10.95 : Bermu-dana $\
-OMS/lmsy/m/n/10.95 ^^U$ \T1/lmr/m/n/10.95 Eu-ropeia (mesmo pay-off), up-and-out
- $\OMS/lmsy/m/n/10.95 ^^T$ \T1/lmr/m/n/10.95 vanilla. 
+! LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.207 ...":{"T":1.0,"steps":128},   # PDE usa só 
+                                                  T
+? 
+
+! LaTeX Error: Invalid UTF-8 byte "B3.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.207 ...":{"T":1.0,"steps":128},   # PDE usa só 
+                                                  T
+? 
+
+Overfull \hbox (116.46118pt too wide) in paragraph at lines 221--222
+[]\T1/lmr/m/n/10.95 Heston: [][]\T1/lmtt/m/n/10.95 {"name":"heston","r":...,"q"
+:...,"kappa":...,"theta":...,"xi":...,"rho":...,"v0":...}[]\T1/lmr/m/n/10.95 . 
+
  []
 
 [4]
 
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
+! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.276 \end{verbatim}
-                    
+l.279 print(f"MC={pmc:.4f} ± 
+                              {1.96*se:.4f} | BS={pbs:.4f}")
 ? 
 
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
+! LaTeX Error: Invalid UTF-8 byte "B1.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character └ (U+2514)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character │ (U+2502)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character └ (U+2514)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
-? 
-
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.276 \end{verbatim}
-                    
+l.279 print(f"MC={pmc:.4f} ± 
+                              {1.96*se:.4f} | BS={pbs:.4f}")
 ? 
 [5]
 
-! LaTeX Error: Unicode character └ (U+2514)
-               not set up for use with LaTeX.
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 304.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\le' on input line 304.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 304.
+
+
+! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.276 \end{verbatim}
-                    
+l.320   print(f"ex_every={ex:>2}: {p:.4f} ± 
+                                             {1.96*se:.4f}")
 ? 
 
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
+! LaTeX Error: Invalid UTF-8 byte "B1.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.276 \end{verbatim}
-                    
+l.320   print(f"ex_every={ex:>2}: {p:.4f} ± 
+                                             {1.96*se:.4f}")
 ? 
+[6]
 
-! LaTeX Error: Unicode character ├ (U+251C)
-               not set up for use with LaTeX.
+! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.276 \end{verbatim}
-                    
+l.333 print(f"FFT={p_fft:.4f} | MC={p_mc:.4f} ± 
+                                                 {1.96*se:.4f}")
 ? 
 
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
+! LaTeX Error: Invalid UTF-8 byte "B1.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.276 \end{verbatim}
-                    
+l.333 print(f"FFT={p_fft:.4f} | MC={p_mc:.4f} ± 
+                                                 {1.96*se:.4f}")
 ? 
 
-! LaTeX Error: Unicode character └ (U+2514)
-               not set up for use with LaTeX.
+! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.276 \end{verbatim}
-                    
+l.345 print(p, "±",
+                     1.96*se)
 ? 
 
-! LaTeX Error: Unicode character ─ (U+2500)
-               not set up for use with LaTeX.
+! LaTeX Error: Invalid UTF-8 byte "B1.
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.276 \end{verbatim}
-                    
+l.345 print(p, "±",
+                     1.96*se)
 ? 
-[6] (derivx_whitepaper.aux)
+[7] [8] (derivx_whitepaper.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
@@ -1243,42 +813,86 @@ Package rerunfilecheck Warning: File `derivx_whitepaper.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `derivx_whitepaper.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  82CF8F69DD3A320F85B21A09B2146C4A;3738.
+(rerunfilecheck)             Before: ED428FCEC48CB47C0F356B3C128E902B;3762
+(rerunfilecheck)             After:  8CB0B995E1C095B426867DF830FD93A5;5412.
  ) 
 Here is how much of TeX's memory you used:
- 14093 strings out of 474485
- 215518 string characters out of 5743262
- 2232542 words of memory out of 5000000
- 36042 multiletter control sequences out of 15000+600000
- 630385 words of font info for 81 fonts, out of 8000000 for 9000
+ 14205 strings out of 474485
+ 217356 string characters out of 5743262
+ 2397542 words of memory out of 5000000
+ 36096 multiletter control sequences out of 15000+600000
+ 634974 words of font info for 83 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,7n,79p,556b,2074s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.p
-fb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.
-pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbxi1
-0.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex
-10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmm
-i10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
-mi6.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
-mi8.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
-r10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
-r12.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
-r17.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
-r6.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr
-8.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri
-10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr
-i12.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
-sy10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/l
-msy8.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/l
-mtk10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/
-lmtt10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm
-/lmtt12.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/l
-m/lmtti10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public
-/amsfonts/symbols/msbm10.pfb>
-Output written on derivx_whitepaper.pdf (6 pages, 435022 bytes).
+ 75i,11n,79p,556b,2076s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+pdfTeX warning (dest): name{section.10} has been referenced but does not exist,
+ replaced by a fixed one
+
+
+pdfTeX warning (dest): name{section.9} has been referenced but does not exist, 
+replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.8.3} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.8.2} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.8.1} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.5.4} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.5.3} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.5.2} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.5.1} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.4.5} has been referenced but does not ex
+ist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{subsection.4.4} has been referenced but does not ex
+ist, replaced by a fixed one
+
+<C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.pfb
+><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pf
+b><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbxi10.
+pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10
+.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi1
+0.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi
+6.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi
+8.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr1
+0.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr1
+2.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr1
+7.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr6
+.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr8.
+pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10
+.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri1
+2.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy
+10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lms
+y8.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmt
+k10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
+tt10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/l
+mtt12.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/
+lmtti10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/a
+msfonts/symbols/msbm10.pfb>
+Output written on derivx_whitepaper.pdf (8 pages, 472017 bytes).
 PDF statistics:
- 302 PDF objects out of 1000 (max. 8388607)
- 133 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 444 PDF objects out of 1000 (max. 8388607)
+ 184 named destinations out of 1000 (max. 500000)
+ 193 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,8 +1,10 @@
-﻿from __future__ import annotations
+﻿# src/derivx/dsl/spec.py
+from __future__ import annotations
 
 import numpy as np
 from typing import Any, Dict, Tuple
 
+from ..payoffs.extra import build_extra_payoff
 from ..curves import PiecewiseFlatCurve
 from ..models.gbm import RiskNeutralGBM
 from ..engine.montecarlo import MonteCarloEngine
@@ -19,20 +21,30 @@ from ..payoffs.core import (
 
 
 def _build_curve(spec: Dict[str, Any]) -> PiecewiseFlatCurve:
+    """
+    Constrói curva piecewise-flat:
+      - Se 'r_curve' for dado: {'times': [...], 'rates': [...]}
+      - Senão, usa taxa plana 'r'
+    """
     if "r_curve" in spec:
         rc = spec["r_curve"]
-        return PiecewiseFlatCurve(np.array(rc["times"], dtype=float),
-                                  np.array(rc["rates"], dtype=float))
+        return PiecewiseFlatCurve(
+            np.array(rc["times"], dtype=float),
+            np.array(rc["rates"], dtype=float),
+        )
     r = float(spec.get("r", 0.0))
     return PiecewiseFlatCurve(np.array([1e-8], dtype=float), np.array([r], dtype=float))
 
 
 def build_engine_from_spec(spec: Dict[str, Any]) -> Tuple[MonteCarloEngine, np.ndarray, list]:
+    """
+    A partir do dict DSL, retorna (engine, times, S0).
+    """
     model_spec = spec["model"]
     r_curve = _build_curve(model_spec)
 
-    q = model_spec.get("q", 0.0)
-    sigma = model_spec.get("sigma", 0.2)
+    q = model_spec.get("q", 0.0)             # float ou lista
+    sigma = model_spec.get("sigma", 0.2)     # float ou lista
     corr = np.array(model_spec.get("corr", [[1.0]]), dtype=float)
 
     model = RiskNeutralGBM(r_curve, q_funcs=q, sigma_funcs=sigma, corr=corr)
@@ -48,6 +60,17 @@ def build_engine_from_spec(spec: Dict[str, Any]) -> Tuple[MonteCarloEngine, np.n
 
 
 def _build_payoff(product: Dict[str, Any]):
+    """
+    Constrói o payoff para estilos europeus.
+    Primeiro tenta os 'extras' (digitais, exchange/Margrabe, up_and_in etc.).
+    Se não reconhecer, cai no conjunto 'core' padrão.
+    """
+    # 1) tenta construir via payoffs extras
+    extra = build_extra_payoff(product)
+    if extra is not None:
+        return extra
+
+    # 2) fallback: payoffs core
     ptype = product.get("type", "european_call")
     if ptype == "european_call":
         return european_call(int(product.get("asset", 0)), float(product["K"]))
@@ -56,13 +79,25 @@ def _build_payoff(product: Dict[str, Any]):
     if ptype == "asian_arith_call":
         return asian_arith_call(int(product.get("asset", 0)), float(product["K"]))
     if ptype == "up_and_out_call":
-        return up_and_out_call(int(product.get("asset", 0)), float(product["K"]), float(product["barrier"]))
+        return up_and_out_call(
+            int(product.get("asset", 0)),
+            float(product["K"]),
+            float(product["barrier"]),
+        )
     if ptype == "basket_call":
+        # usa o basket_call do core (espera 'weights'); por padrão,
+        # aplica aos primeiros len(weights) ativos
         return basket_call(list(product["weights"]), float(product["K"]))
+
     raise ValueError(f"payoff type nao suportado: {ptype}")
 
 
 def _build_exercise(product: Dict[str, Any], times: np.ndarray):
+    """
+    Constrói ExerciseSpec para Bermudan/American.
+    - american: exercício em todas as datas (exceto t=0)
+    - bermudan: por 'exercise_idx', 'exercise_times' (aproxima índice) ou 'exercise_every'
+    """
     style = product.get("style", "european").lower()
     if style == "european":
         return None
@@ -75,7 +110,7 @@ def _build_exercise(product: Dict[str, Any], times: np.ndarray):
         if "exercise_idx" in product:
             ex_idx = list(map(int, product["exercise_idx"]))
         elif "exercise_times" in product:
-            # converte tempos para indices com tolerancia
+            # converte tempos-alvo para índices com aproximação
             want = list(map(float, product["exercise_times"]))
             ex_idx = []
             for wt in want:
@@ -89,6 +124,7 @@ def _build_exercise(product: Dict[str, Any], times: np.ndarray):
             if (len(times) - 1) not in ex_idx:
                 ex_idx.append(len(times) - 1)
 
+    # payoff imediato padrão (vanilla call/put)
     K = float(product.get("K", 100.0))
     asset = int(product.get("asset", 0))
 
@@ -107,6 +143,11 @@ def _build_exercise(product: Dict[str, Any], times: np.ndarray):
 
 
 def price_from_spec(spec: Dict[str, Any]):
+    """
+    Orquestra precificação via DSL.
+    - europeans: eng.price(payoff, ...)
+    - bermudan/american: eng.price_exercisable(exercise_spec, ...)
+    """
     eng, times, S0 = build_engine_from_spec(spec)
     product = spec["product"]
     style = product.get("style", "european").lower()
@@ -114,14 +155,18 @@ def price_from_spec(spec: Dict[str, Any]):
     if style == "european":
         payoff = _build_payoff(product)
         return eng.price(
-            payoff, S0, times,
+            payoff,
+            S0,
+            times,
             n_paths=int(spec.get("n_paths", 100_000)),
             seed=spec.get("seed"),
         )
     else:
         ex = _build_exercise(product, times)
         return eng.price_exercisable(
-            ex, S0, times,
+            ex,
+            S0,
+            times,
             n_paths=int(spec.get("n_paths", 120_000)),
             seed=spec.get("seed"),
         )
