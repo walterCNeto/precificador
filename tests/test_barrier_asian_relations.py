@@ -1,4 +1,4 @@
-﻿from derivx import price_from_spec
+from derivx import price_from_spec
 
 def price(spec):
     p, se = price_from_spec(spec)

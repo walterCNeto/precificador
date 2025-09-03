@@ -1,4 +1,4 @@
-﻿from derivx import price_from_spec
+from derivx import price_from_spec
 
 def test_dsl_european_put_runs():
     spec={"engine":"mc",

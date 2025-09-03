@@ -1,4 +1,4 @@
-ï»¿import pytest
+import pytest
 from derivx import price_from_spec
 
 @pytest.mark.slow
@@ -15,6 +15,6 @@ def test_heston_mc_close_to_fft():
                "n_paths":120_000,"seed":7}
     p_mc,se = price_from_spec(spec_mc)
 
-    # tolerÃ¢ncia estatÃ­stica generosa (MC tem viÃ©s em Î”t): 6*SE ou 0.7 abs
+    # tolerância estatística generosa (MC tem viés em ?t): 6*SE ou 0.7 abs
     tol = max(6.0*se, 0.7)
     assert abs(p_mc - p_fft) < tol

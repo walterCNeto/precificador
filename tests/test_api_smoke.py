@@ -1,4 +1,4 @@
-﻿from derivx import bs_call_price, PiecewiseFlatCurve
+from derivx import bs_call_price, PiecewiseFlatCurve
 import numpy as np, math
 
 def test_bs_call_price_numeric():

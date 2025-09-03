@@ -1,5 +1,4 @@
-﻿# src/derivx/dsl/spec.py
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import numpy as np
 from typing import Any, Dict, Tuple
@@ -19,32 +18,31 @@ from ..payoffs.core import (
     relu,
 )
 
+# === Importes analíticos (fórmulas fechadas) ===
+from ..analytic import (
+    bs_call, bs_put,
+    cash_or_nothing_call, cash_or_nothing_put,
+    asset_or_nothing_call, asset_or_nothing_put,
+    gap_call as an_gap_call, gap_put as an_gap_put,
+    margrabe_exchange_call,
+)
+
 
 def _build_curve(spec: Dict[str, Any]) -> PiecewiseFlatCurve:
-    """
-    Constrói curva piecewise-flat:
-      - Se 'r_curve' for dado: {'times': [...], 'rates': [...]}
-      - Senão, usa taxa plana 'r'
-    """
     if "r_curve" in spec:
         rc = spec["r_curve"]
-        return PiecewiseFlatCurve(
-            np.array(rc["times"], dtype=float),
-            np.array(rc["rates"], dtype=float),
-        )
+        return PiecewiseFlatCurve(np.array(rc["times"], dtype=float),
+                                  np.array(rc["rates"], dtype=float))
     r = float(spec.get("r", 0.0))
     return PiecewiseFlatCurve(np.array([1e-8], dtype=float), np.array([r], dtype=float))
 
 
 def build_engine_from_spec(spec: Dict[str, Any]) -> Tuple[MonteCarloEngine, np.ndarray, list]:
-    """
-    A partir do dict DSL, retorna (engine, times, S0).
-    """
     model_spec = spec["model"]
     r_curve = _build_curve(model_spec)
 
-    q = model_spec.get("q", 0.0)             # float ou lista
-    sigma = model_spec.get("sigma", 0.2)     # float ou lista
+    q = model_spec.get("q", 0.0)
+    sigma = model_spec.get("sigma", 0.2)
     corr = np.array(model_spec.get("corr", [[1.0]]), dtype=float)
 
     model = RiskNeutralGBM(r_curve, q_funcs=q, sigma_funcs=sigma, corr=corr)
@@ -62,7 +60,7 @@ def build_engine_from_spec(spec: Dict[str, Any]) -> Tuple[MonteCarloEngine, np.n
 def _build_payoff(product: Dict[str, Any]):
     """
     Constrói o payoff para estilos europeus.
-    Primeiro tenta os 'extras' (digitais, exchange/Margrabe, up_and_in etc.).
+    Primeiro tenta os 'extras' (digitais, exchange/Margrabe, gap etc.).
     Se não reconhecer, cai no conjunto 'core' padrão.
     """
     # 1) tenta construir via payoffs extras
@@ -85,19 +83,12 @@ def _build_payoff(product: Dict[str, Any]):
             float(product["barrier"]),
         )
     if ptype == "basket_call":
-        # usa o basket_call do core (espera 'weights'); por padrão,
-        # aplica aos primeiros len(weights) ativos
         return basket_call(list(product["weights"]), float(product["K"]))
 
     raise ValueError(f"payoff type nao suportado: {ptype}")
 
 
 def _build_exercise(product: Dict[str, Any], times: np.ndarray):
-    """
-    Constrói ExerciseSpec para Bermudan/American.
-    - american: exercício em todas as datas (exceto t=0)
-    - bermudan: por 'exercise_idx', 'exercise_times' (aproxima índice) ou 'exercise_every'
-    """
     style = product.get("style", "european").lower()
     if style == "european":
         return None
@@ -110,7 +101,6 @@ def _build_exercise(product: Dict[str, Any], times: np.ndarray):
         if "exercise_idx" in product:
             ex_idx = list(map(int, product["exercise_idx"]))
         elif "exercise_times" in product:
-            # converte tempos-alvo para índices com aproximação
             want = list(map(float, product["exercise_times"]))
             ex_idx = []
             for wt in want:
@@ -124,7 +114,6 @@ def _build_exercise(product: Dict[str, Any], times: np.ndarray):
             if (len(times) - 1) not in ex_idx:
                 ex_idx.append(len(times) - 1)
 
-    # payoff imediato padrão (vanilla call/put)
     K = float(product.get("K", 100.0))
     asset = int(product.get("asset", 0))
 
@@ -136,18 +125,96 @@ def _build_exercise(product: Dict[str, Any], times: np.ndarray):
         St = PF.at_time(paths, asset, k)
         return relu(K - St)
 
-    ptype = product.get("type", "european_call")
+    ptype = product.get("type", "european_call").lower()
     imm = imm_put if "put" in ptype else imm_call
 
     return ExerciseSpec(exercise_idx=ex_idx, immediate_payoff=imm)
 
 
+# ============================
+#   Motor ANALÍTICO (fechado)
+# ============================
+def _to_scalar_or_list(x, i: int) -> float:
+    if isinstance(x, (list, tuple, np.ndarray)):
+        return float(x[i])
+    return float(x)
+
+def _price_analytic(spec: Dict[str, Any]) -> Tuple[float, float] | None:
+    product = spec["product"]
+    model = spec["model"]
+    grid = spec.get("grid", {"T": 1.0})
+    T = float(grid.get("T", 1.0))
+    S0 = spec.get("S0", [100.0])
+
+    r = float(model.get("r", 0.0))
+    q = model.get("q", 0.0)
+    sigma = model.get("sigma", 0.2)
+    corr = np.array(model.get("corr", [[1.0]]), dtype=float)
+
+    ptype = str(product.get("type", "")).lower()
+    style = str(product.get("style", "european")).lower()
+    if style != "european":
+        return None  # analítico apenas para europeias aqui
+
+    # BS vanilla
+    if ptype == "european_call":
+        a = int(product.get("asset", 0))
+        K = float(product["K"])
+        return bs_call(S0[a], K, r, _to_scalar_or_list(q,a), _to_scalar_or_list(sigma,a), T), 0.0
+    if ptype == "european_put":
+        a = int(product.get("asset", 0))
+        K = float(product["K"])
+        return bs_put(S0[a], K, r, _to_scalar_or_list(q,a), _to_scalar_or_list(sigma,a), T), 0.0
+
+    # Digitais (Haug)
+    if ptype in ("cash_or_nothing_call", "digital_cash_call", "binary_cash_call"):
+        a = int(product.get("asset", 0)); K=float(product["K"]); cash=float(product.get("cash",1.0))
+        return cash_or_nothing_call(S0[a],K,r,_to_scalar_or_list(q,a),_to_scalar_or_list(sigma,a),T,cash), 0.0
+    if ptype in ("cash_or_nothing_put", "digital_cash_put", "binary_cash_put"):
+        a = int(product.get("asset", 0)); K=float(product["K"]); cash=float(product.get("cash",1.0))
+        return cash_or_nothing_put (S0[a],K,r,_to_scalar_or_list(q,a),_to_scalar_or_list(sigma,a),T,cash), 0.0
+    if ptype in ("asset_or_nothing_call", "digital_asset_call"):
+        a = int(product.get("asset", 0)); K=float(product["K"])
+        return asset_or_nothing_call(S0[a],K,r,_to_scalar_or_list(q,a),_to_scalar_or_list(sigma,a),T), 0.0
+    if ptype in ("asset_or_nothing_put", "digital_asset_put"):
+        a = int(product.get("asset", 0)); K=float(product["K"])
+        return asset_or_nothing_put (S0[a],K,r,_to_scalar_or_list(q,a),_to_scalar_or_list(sigma,a),T), 0.0
+
+    # Gap
+    if ptype == "gap_call":
+        a = int(product.get("asset", 0)); K1=float(product.get("K1", product.get("payoff_strike")))
+        K2 = float(product.get("K2", product.get("trigger")))
+        return an_gap_call(S0[a],K1,K2,r,_to_scalar_or_list(q,a),_to_scalar_or_list(sigma,a),T), 0.0
+    if ptype == "gap_put":
+        a = int(product.get("asset", 0)); K1=float(product.get("K1", product.get("payoff_strike")))
+        K2 = float(product.get("K2", product.get("trigger")))
+        return an_gap_put (S0[a],K1,K2,r,_to_scalar_or_list(q,a),_to_scalar_or_list(sigma,a),T), 0.0
+
+    # Margrabe (exchange)
+    if ptype in ("margrabe_exchange_call","exchange_call"):
+        a_long  = int(product.get("asset1",  product.get("asset_long", 0)))
+        a_short = int(product.get("asset2",  product.get("asset_short",1)))
+        q1 = _to_scalar_or_list(q, a_long);  q2 = _to_scalar_or_list(q, a_short)
+        s1 = _to_scalar_or_list(sigma, a_long); s2 = _to_scalar_or_list(sigma, a_short)
+        rho = float(corr[a_long, a_short])
+        return margrabe_exchange_call(S0[a_long], S0[a_short], r, q1, q2, s1, s2, rho, T), 0.0
+
+    return None
+
+
 def price_from_spec(spec: Dict[str, Any]):
-    """
-    Orquestra precificação via DSL.
-    - europeans: eng.price(payoff, ...)
-    - bermudan/american: eng.price_exercisable(exercise_spec, ...)
-    """
+    # engine: "mc" (default), "analytic", "auto"
+    engine = str(spec.get("engine", "mc")).lower()
+
+    # caminho analítico (opcional)
+    if engine in ("analytic","auto"):
+        out = _price_analytic(spec)
+        if out is not None:
+            return out
+        if engine == "analytic":
+            raise ValueError("engine='analytic' não suporta este payoff/modelo. Tente 'mc'.")
+
+    # MC/LSMC
     eng, times, S0 = build_engine_from_spec(spec)
     product = spec["product"]
     style = product.get("style", "european").lower()
@@ -155,18 +222,14 @@ def price_from_spec(spec: Dict[str, Any]):
     if style == "european":
         payoff = _build_payoff(product)
         return eng.price(
-            payoff,
-            S0,
-            times,
+            payoff, S0, times,
             n_paths=int(spec.get("n_paths", 100_000)),
             seed=spec.get("seed"),
         )
     else:
         ex = _build_exercise(product, times)
         return eng.price_exercisable(
-            ex,
-            S0,
-            times,
+            ex, S0, times,
             n_paths=int(spec.get("n_paths", 120_000)),
             seed=spec.get("seed"),
         )

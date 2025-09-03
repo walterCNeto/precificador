@@ -1,4 +1,4 @@
-﻿from math import exp
+from math import exp
 from derivx import bs_call_price
 
 def test_put_call_parity_atm():

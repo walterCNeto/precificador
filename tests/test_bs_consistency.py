@@ -1,6 +1,6 @@
-﻿import numpy as np
+import numpy as np
 from derivx import price_from_spec, bs_call_price
-# Se vocÃª renomeou o pacote para 'precificador', troque a linha acima por:
+# Se você renomeou o pacote para 'precificador', troque a linha acima por:
 # from precificador import price_from_spec, bs_call_price
 
 def test_european_call_bs_consistency():
