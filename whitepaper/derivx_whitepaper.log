@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.8.11)  3 SEP 2025 17:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.8.11)  4 SEP 2025 13:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -465,7 +465,8 @@ ftex.def
 File: l3backend-pdftex.def 2024-01-04 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count306
 \l__pdf_internal_box=\box57
-) (derivx_whitepaper.aux)
+)
+No file derivx_whitepaper.aux.
 \openout1 = `derivx_whitepaper.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
@@ -486,7 +487,6 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 34.
 LaTeX Font Info:    ... okay on input line 34.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 34.
 LaTeX Font Info:    ... okay on input line 34.
-
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -548,15 +548,13 @@ cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
 Package hyperref Info: Link coloring ON on input line 34.
- (derivx_whitepaper.out) (derivx_whitepaper.out)
 \@outlinefile=\write3
 \openout3 = `derivx_whitepaper.out'.
 
 \c@lstlisting=\count313
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 3
 6.
-
-(C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
+ (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 3
@@ -601,23 +599,15 @@ LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-(derivx_whitepaper.toc
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 5.
-)
+No file derivx_whitepaper.toc.
 \tf@toc=\write4
 \openout4 = `derivx_whitepaper.toc'.
 
- [1
-
-{C:/Users/Lenovo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Len
-ovo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/Lenovo
-/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}]
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2023/02/27 1.9 listings language file
 )
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 61.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 62.
 
 ! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
@@ -625,7 +615,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.72 print("MC:", p, "±",
+l.73 print("MC:", p, "±",
                            1.96*se)
 ? 
 
@@ -635,27 +625,34 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.72 print("MC:", p, "±",
+l.73 print("MC:", p, "±",
                            1.96*se)
 ? 
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 7
-8.
+9.
 (C:\Users\Lenovo\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 79.
+ [1
+
+{C:/Users/Lenovo/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/Len
+ovo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}{C:/Users/Lenovo
+/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}{C:/Users/Lenovo/A
+ppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/Lenovo/
+AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Users/Lenovo/App
+Data/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Users/Lenovo/Ap
+pData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 95.
+(hyperref)                removing `math shift' on input line 98.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 95.
+(hyperref)                removing `math shift' on input line 98.
 
-[2{C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}
-{C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc
-}{C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C
-:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}]
-[3]
+[2] [3]
 
 ! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
@@ -663,7 +660,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.183 print(price, "±",
+l.208 print(price, "±",
                          1.96*se)
 ? 
 
@@ -673,11 +670,11 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.183 print(price, "±",
+l.208 print(price, "±",
                          1.96*se)
 ? 
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 200.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 225.
 
 ! LaTeX Error: Invalid UTF-8 byte sequence (�\expandafter).
 
@@ -685,7 +682,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.207 ...":{"T":1.0,"steps":128},   # PDE usa só 
+l.232 ...":1.0,"steps":128},   # PDE/FFT usam só 
                                                   T
 ? 
 
@@ -695,17 +692,10 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.207 ...":{"T":1.0,"steps":128},   # PDE usa só 
+l.232 ...":1.0,"steps":128},   # PDE/FFT usam só 
                                                   T
 ? 
-[4]
-Overfull \hbox (116.46118pt too wide) in paragraph at lines 221--222
-[]\T1/lmr/m/n/10.95 Heston: [][]\T1/lmtt/m/n/10.95 {"name":"heston","r":...,"q"
-:...,"kappa":...,"theta":...,"xi":...,"rho":...,"v0":...}[]\T1/lmr/m/n/10.95 . 
-
- []
-
-[5]
+[4] [5]
 
 ! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
@@ -713,7 +703,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.279 print(f"MC={pmc:.4f} ± 
+l.335 print(f"MC={pmc:.4f} ± 
                               {1.96*se:.4f} | BS={pbs:.4f}")
 ? 
 
@@ -723,30 +713,30 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.279 print(f"MC={pmc:.4f} ± 
+l.335 print(f"MC={pmc:.4f} ± 
                               {1.96*se:.4f} | BS={pbs:.4f}")
 ? 
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 304.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\le' on input line 304.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 304.
-
 [6]
 
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 360.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\le' on input line 360.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 360.
+
+
 ! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
 See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.320   print(f"ex_every={ex:>2}: {p:.4f} ± 
+l.376   print(f"ex_every={ex:>2}: {p:.4f} ± 
                                              {1.96*se:.4f}")
 ? 
 
@@ -756,9 +746,10 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.320   print(f"ex_every={ex:>2}: {p:.4f} ± 
+l.376   print(f"ex_every={ex:>2}: {p:.4f} ± 
                                              {1.96*se:.4f}")
 ? 
+[7]
 
 ! LaTeX Error: Invalid UTF-8 byte sequence (�\lst@FillFixed@).
 
@@ -766,7 +757,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.333 print(f"FFT={p_fft:.4f} | MC={p_mc:.4f} ± 
+l.389 print(f"FFT={p_fft:.4f} | MC={p_mc:.4f} ± 
                                                  {1.96*se:.4f}")
 ? 
 
@@ -776,7 +767,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.333 print(f"FFT={p_fft:.4f} | MC={p_mc:.4f} ± 
+l.389 print(f"FFT={p_fft:.4f} | MC={p_mc:.4f} ± 
                                                  {1.96*se:.4f}")
 ? 
 
@@ -786,7 +777,7 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.345 print(p, "±",
+l.401 print(p, "±",
                      1.96*se)
 ? 
 
@@ -796,23 +787,42 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.345 print(p, "±",
+l.401 print(p, "±",
                      1.96*se)
 ? 
-[7] [8] (derivx_whitepaper.aux)
+[8]
+
+! LaTeX Error: Unicode character Φ (U+03A6)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.447 \end{verbatim}
+                    
+? 
+[9] (derivx_whitepaper.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
-Package rerunfilecheck Info: File `derivx_whitepaper.out' has not changed.
-(rerunfilecheck)             Checksum: 8CB0B995E1C095B426867DF830FD93A5;5412.
+
+
+Package rerunfilecheck Warning: File `derivx_whitepaper.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `derivx_whitepaper.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  F5069D03265946F0803B146BF2B0245E;5842.
  ) 
 Here is how much of TeX's memory you used:
- 14198 strings out of 474485
- 217390 string characters out of 5743262
- 2368542 words of memory out of 5000000
- 36098 multiletter control sequences out of 15000+600000
- 639245 words of font info for 84 fonts, out of 8000000 for 9000
+ 14219 strings out of 474485
+ 217256 string characters out of 5743262
+ 2378542 words of memory out of 5000000
+ 36073 multiletter control sequences out of 15000+600000
+ 634974 words of font info for 83 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  75i,11n,79p,556b,2076s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.p
@@ -831,15 +841,16 @@ r6.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr
 10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr
 i12.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lm
 sy10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/l
+msy6.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/l
 msy8.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/l
 mtk10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/
 lmtt10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm
 /lmtt12.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public/l
 m/lmtti10.pfb><C:/Users/Lenovo/AppData/Local/Programs/MiKTeX/fonts/type1/public
 /amsfonts/symbols/msbm10.pfb>
-Output written on derivx_whitepaper.pdf (8 pages, 479891 bytes).
+Output written on derivx_whitepaper.pdf (9 pages, 491793 bytes).
 PDF statistics:
- 454 PDF objects out of 1000 (max. 8388607)
- 173 named destinations out of 1000 (max. 500000)
- 193 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 432 PDF objects out of 1000 (max. 8388607)
+ 227 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

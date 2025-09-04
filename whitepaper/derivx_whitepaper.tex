@@ -27,7 +27,7 @@
 }
 
 \title{\textbf{derivx} --- Precificador de Derivativos por \emph{Building Blocks}\\
-\large MC/LSMC, PDE Crank--Nicolson e FFT (Heston) com DSL Declarativa}
+\large MC/LSMC, PDE Crank--Nicolson, FFT (Heston) e IR Black--76 com DSL Declarativa}
 \author{Walter C. Neto (repo: \url{https://github.com/walterCNeto/precificador})}
 \date{\today}
 
@@ -38,10 +38,11 @@
 \texttt{derivx} é uma biblioteca leve e extensível para precificação de derivativos em Python.
 A arquitetura separa: (i) \emph{modelo sob risco-neutro} (gerador de trajetórias),
 (ii) \emph{numerário/curva} (desconto determinístico), (iii) \emph{payoffs} como funcionais de trajetória (PF) componíveis,
-e (iv) \emph{política de exercício} (Europeu/Bermudano/Americano via LSMC).
+e (iv) \emph{política de exercício} (Européias/Bermudas/Americanas via LSMC).
 Uma DSL declarativa (JSON/dict) permite especificar produtos sem escrever código novo.
-Inclui backends MC (GBM/Heston), PDE 1D (Crank--Nicolson) para vanillas e FFT (Carr--Madan) para Heston europeu.
-Exemplos, testes e CI acompanham o pacote. Este documento traz teoria, API, guias de uso e exemplos.
+Inclui backends MC (GBM/Heston), PDE 1D (Crank--Nicolson) para vanillas, FFT (Carr--Madan) para Heston europeu,
+e \textbf{módulo de Juros (IR) com fórmulas fechadas Black--76}: ZCB, FRA, Swap (PV e taxa par), Cap/Floor (caplets/floorlets) e
+Swaption pagador/recebedor. Exemplos, testes e CI acompanham o pacote. Este documento traz teoria, API, guias de uso e exemplos.
 \end{abstract}
 
 \tableofcontents
@@ -77,27 +78,29 @@ print("BS:", bs_call_price(100, 100, r=0.05, q=0.0, sigma=0.2, T=1.0))
 \begin{itemize}[leftmargin=1.2em]
 \item \textbf{Curva (numerário).} \texttt{PiecewiseFlatCurve} implementa $r(t)$ \emph{piecewise-flat} com desconto
 $DF(t_0,t_1)=\exp\{-\int_{t_0}^{t_1} r(u)\,du\}$ exato por trechos.
-\item \textbf{Modelos sob $\mathbb{Q}$.} 
-GBM multiativo (\texttt{RiskNeutralGBM}) com $q_i(t)$, $\sigma_i(t)$ e correlação, e Heston para europeias (MC/FFT).
+\item \textbf{Modelos sob $\mathbb{Q}$.}
+GBM multiativo (\texttt{RiskNeutralGBM}) com $q_i(t)$, $\sigma_i(t)$ e correlação; Heston (MC/FFT) para europeias.
 \item \textbf{Funcionais de trajetória (PF).} Utilitários vetorizados: $S_{t_k}$, máximos/mínimos corridos, médias, barreiras, cestas.
 Payoffs são funções \verb|paths -> np.ndarray|.
-\item \textbf{Motores numéricos.} 
+\item \textbf{Motores numéricos.}
 \emph{MC}: simulação e estimação $E_{\mathbb Q}[X]$ (antitético e CV opcionais).
 \emph{PDE CN}: 1D para calls/puts; exercício americano via projeção $\max$ por passo de tempo.
 \emph{FFT (Heston)}: Carr--Madan com parâmetros $\alpha$, $N$, $\eta$.
 \item \textbf{Exercício (LSMC).} \texttt{ExerciseSpec} + \texttt{lsmc.price}: regressão do valor de continuação em features (por padrão $\log S$,
 base polinomial até grau 2 + cruzados).
+\item \textbf{IR Black--76 (analítico).} Módulo \verb|ir.black76|: ZCB, FRA, Swap (PV e taxa par), Cap/Floor (soma de caplets/floorlets),
+Swaption pagador/recebedor (Black--76 sobre a taxa de swap). Integração direta na DSL via \verb|engine:"analytic"|.
 \item \textbf{DSL.} \texttt{price\_from\_spec(spec)} mapeia um dicionário JSON para engine, grade temporal e produto.
 \end{itemize}
 
 \section{Base teórica}
 
-\subsection{Precificação sob $\mathbb{Q}$ e numeraire}
+\subsection{Precificação sob $\mathbb{Q}$ e numerário}
 Seja $B(t)=\exp\{\int_0^t r(u)\,du\}$ o banco. Para payoff $X$ em $T$:
 \[
 \Pi_0=\mathbb E^{\mathbb Q}\!\left[\frac{X}{B(T)}\right]=DF(0,T)\,\mathbb E^{\mathbb Q}[X].
 \]
-No MC estimamos $\hat \Pi_0 = DF(0,T)\,\overline{X}$ com erro-padrão 
+No MC estimamos $\hat \Pi_0 = DF(0,T)\,\overline{X}$ com erro-padrão
 $\mathrm{SE}=s_X/\sqrt{N}$ e IC 95\% como $\pm 1.96\,\mathrm{SE}$.
 
 \subsection{GBM multiativo e simulação exata}
@@ -106,56 +109,78 @@ Para $i=1,\dots,D$:
 \frac{dS_i}{S_i}=(r(t)-q_i(t))\,dt+\sigma_i(t)\,dW_i^{\mathbb Q}(t),\quad
 \mathrm{Cov}(dW_i,dW_j)=\rho_{ij}\,dt.
 \]
-No passo $\Delta t$: 
+No passo $\Delta t$:
 \[
 S_{t+\Delta t} = S_t\exp\!\Big((r-q-\tfrac12\sigma^2)\Delta t + \sigma\sqrt{\Delta t}\,Z\Big),
 \]
 com $Z\sim \mathcal N(0,\rho)$ via Cholesky. Antitético usa $Z$ e $-Z$.
-\emph{Bias} temporal é $\mathcal O(\Delta t)$ para payoffs path-dependentes; use \texttt{steps} adequados.
 
 \subsection{LSMC (Longstaff--Schwartz)}
 Datas de exercício $\mathcal T=\{t_{k_j}\}$; payoff imediato $g(S_{t_k})$.
-Seja $V_k$ o valor ótimo ao tempo $t_k$ e $\tau$ a \emph{stopping time} ótima.
+Seja $V_k$ o valor ótimo em $t_k$ e $\tau$ a \emph{stopping time} ótima.
 Define-se o valor de continuação:
 \[
 C_k(s)=\mathbb E\!\big[\,DF(t_k,t_{k+1})\,V_{k+1}\,\big|\,S_{t_k}=s\big].
 \]
-O algoritmo:
-\begin{enumerate}[nosep]
-\item Simule caminhos $S^{(n)}_{t_k}$.
-\item No vencimento $t_{k^\star}$, $V^{(n)}=g(S^{(n)}_{t_{k^\star}})$.
-\item Para $k$ decrescendo nos tempos de exercício: estime $C_k$ por regressão (apenas nos ITM).
-\item Em cada caminho, exerça em $t_k$ se $g(S_{t_k})\ge \widehat C_k(S_{t_k})$.
-\end{enumerate}
-\textbf{Cuidados práticos}: (i) restringir regressão ao ITM; (ii) usar desconto correto entre janelas ($\Delta t$ possivelmente múltiplas); 
-(iii) evitar overfit (cross-fit A/B); (iv) checar monotonia: Bermudan densificando $\Rightarrow$ aproxima Americano.
+Algoritmo em \emph{backward induction} com regressão (ITM) e regra de parada $g \ge \widehat C$.
 
 \subsection{PDE 1D Crank--Nicolson (vanillas)}
-Para um ativo sob GBM, a PDE de Black--Scholes para $V(S,t)$:
+PDE de Black--Scholes:
 \[
 \partial_t V + (r-q)S\,\partial_S V + \tfrac12\sigma^2 S^2 \partial^2_{SS}V - rV = 0.
 \]
-CN discretiza implicitamente em $t$ e centralmente em $S$, levando a um sistema tridiagonal por passo.
-\textbf{Condições de contorno} usuais:
-\begin{itemize}[nosep,leftmargin=1.2em]
-\item \emph{Call}: $V(0,t)=0$; $V(S_{\max},t)\approx S_{\max}e^{-q(T-t)}-Ke^{-r(T-t)}$.
-\item \emph{Put}: $V(0,t)\approx Ke^{-r(T-t)}$; $V(S_{\max},t)\to 0$.
-\end{itemize}
-\textbf{Americano}: após resolver o passo, projeta-se $V\gets\max(V,\,\text{payoff imediato})$.
-\textbf{Convergência}: $\mathcal O(\Delta t + \Delta S^2)$. Aumentar \texttt{NS}, \texttt{NT} e \texttt{Smax\_mult} melhora acurácia.
+CN $\Rightarrow$ sistema tridiagonal por passo; Americano: projeção $V\gets\max(V,\text{payoff})$.
 
 \subsection{FFT (Heston europeu)}
-Em Heston, precificação por Carr--Madan calcula preços via a transformada de Fourier do payoff amortecido por $\alpha>0$:
+Carr--Madan: $C(K)=\frac{e^{-\alpha k}}{\pi}\int_0^\infty \Re(\mathrm{e}^{-iuk}\psi(u))\,du$, $k=\ln K$;
+discretização uniforme em frequência ($\eta$) e FFT de tamanho $N$.
+
+\subsection{Módulo de Juros (IR) --- Black--76 e curva \emph{piecewise-flat}}
+\paragraph{Curva e fatores de desconto.}
+Com $r(t)$ \emph{piecewise-flat}, o fator de desconto $D(0,T)=\exp\{-\int_0^T r(u)\,du\}$ é exato por trechos. Para
+prazos discretos $0=T_0<T_1<\cdots<T_m$, o \emph{forward simples} sobre $[T_i,T_{i+1}]$ é
 \[
-C(K) = \frac{e^{-\alpha k}}{\pi}\int_0^\infty \Re\!\big( e^{-iu k}\,\psi(u)\big)\,du,\quad k=\ln K.
+F_i = \frac{1}{\tau_i}\left(\frac{D(0,T_i)}{D(0,T_{i+1})} - 1\right), \quad \tau_i=T_{i+1}-T_i.
 \]
-Com discretização uniforme em frequência ($\eta$) e tamanho de malha $N$,
-uma FFT retorna uma grade de preços para diversos \emph{strikes}. Parâmetros:
-\begin{itemize}[nosep,leftmargin=1.2em]
-\item $\alpha$ (damping, típico $1.0$--$2.0$), 
-\item $N$ (tamanho da FFT, potência de 2),
-\item $\eta$ (passo em frequência; governa espaçamento em strikes).
-\end{itemize}
+
+\paragraph{ZCB e FRA.}
+Um zero cupom de nominal $N$ com vencimento $T$: $\mathrm{PV}_0 = N\,D(0,T)$.
+Um FRA que liquida em $T_{i+1}$ com taxa fixa $K$ tem payoff $N\,\tau_i\,(L_i-K)$ no tempo $T_{i+1}$
+e valor hoje
+\[
+\mathrm{PV}_0^{\mathrm{FRA}} = N\,D(0,T_{i+1})\,\tau_i\,(F_i - K).
+\]
+
+\paragraph{Swap: taxa par e PV.}
+Para pagamentos fixos em $\{T_1,\dots,T_m\}$ com frações $\{\tau_i\}$, o \emph{anuidade} é $A=\sum_{i=1}^m \tau_i D(0,T_i)$.
+A taxa \emph{par} é
+\[
+K^\star = \frac{D(0,T_0)-D(0,T_m)}{A}.
+\]
+O PV de um \emph{payer swap} (paga fixo $K$, recebe flutuante) é
+\[
+\mathrm{PV}_0^{\mathrm{swap}} = N\Big(D(0,T_0)-D(0,T_m) - K\,A\Big).
+\]
+
+\paragraph{Cap/Floor (Black--76).}
+Um \emph{caplet} sobre $[T_i,T_{i+1}]$ tem payoff $N\,\tau_i \max(L_i-K,0)$ em $T_{i+1}$.
+No modelo Black--76 com volatilidade $\sigma$ sobre $F_i$ até o tempo de \emph{reset} $T_i$,
+\[
+\mathrm{PV}_0^{\mathrm{caplet}} = N\,D(0,T_{i+1})\,\tau_i\big(F_i \Phi(d_1) - K \Phi(d_2)\big),
+\quad d_{1,2}=\frac{\ln(F_i/K)\pm \tfrac12 \sigma^2 T_i}{\sigma\sqrt{T_i}}.
+\]
+Um \emph{cap} é a soma dos caplets; \emph{floor} é análogo com $K$ e $F_i$ trocados de sinal.
+
+\paragraph{Swaption (Black--76).}
+Para uma swaption \emph{pagadora} com exercício em $T_0$ sobre o swap que paga fixo $K$
+nos tempos $\{T_1,\dots,T_m\}$, define-se o \emph{anuidade} $A=\sum_{i=1}^m \tau_i D(0,T_i)$
+e a taxa de \emph{swap a termo} $F_{\mathrm{swap}}=\frac{D(0,T_0)-D(0,T_m)}{A}$.
+Sob Black--76 com volat. $\sigma$ da taxa de swap até $T_0$,
+\[
+\mathrm{PV}_0^{\mathrm{payer\ swpt}} = N\,A\big(F_{\mathrm{swap}}\Phi(d_1) - K \Phi(d_2)\big),
+\quad d_{1,2}=\frac{\ln(F_{\mathrm{swap}}/K)\pm \tfrac12 \sigma^2 T_0}{\sigma\sqrt{T_0}}.
+\]
+A \emph{receiver} troca $F_{\mathrm{swap}}$ e $K$.
 
 \section{Como usar a biblioteca}
 
@@ -202,9 +227,9 @@ price, se = eng.price_exercisable(spec, S0, times, n_paths=150_000, seed=7)
 from derivx import price_from_spec
 
 spec = {
-  "engine":"mc",  # "mc" | "pde" | "fft"
+  "engine":"mc",  # "mc" | "pde" | "fft" | "analytic" | "auto"
   "model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
-  "grid":{"T":1.0,"steps":128},   # PDE usa só T
+  "grid":{"T":1.0,"steps":128},   # PDE/FFT usam só T
   "S0":[100.0],
   "product":{"style":"european","type":"european_call","asset":0,"K":100.0},
   "n_paths":80_000,"seed":7
@@ -212,25 +237,50 @@ spec = {
 price, se = price_from_spec(spec)
 \end{lstlisting}
 
-\paragraph{Chaves suportadas.}
-\begin{itemize}[leftmargin=1.2em]
-\item \texttt{engine}: \verb|"mc"|, \verb|"pde"|, \verb|"fft"|.
-\item \texttt{model}:
-\begin{itemize}[nosep]
-\item GBM: \verb|{"name":"gbm","r":..., "q":..., "sigma":...}|.
-\item Heston: \verb|{"name":"heston","r":...,"q":...,"kappa":...,"theta":...,"xi":...,"rho":...,"v0":...}|.
-\end{itemize}
-\item \texttt{grid}: \verb|{"T":..., "steps":...}| (MC); PDE usa \verb|{"T":...}|.
-\item \texttt{S0}: lista de preços iniciais.
-\item \texttt{product}:
-\begin{itemize}[nosep]
-\item Vanilla: \verb|european_call|, \verb|european_put|.
-\item Path-dep.: \verb|asian_arith_call|, \verb|up_and_out_call|.
-\item Exercício: \verb|{"style":"bermudan","type":"european_put","exercise_every":16}|.
-\end{itemize}
-\item Parâmetros do motor: MC (\verb|n_paths|, \verb|seed|), PDE (\verb|NS|, \verb|NT|, \verb|Smax_mult|),
-FFT (\verb|alpha|, \verb|N|, \verb|eta|).
-\end{itemize}
+\subsection*{IR via DSL (analítico)}
+\begin{lstlisting}[style=pystyle]
+# (IR1) ZCB
+spec_zcb = {
+  "engine":"analytic",
+  "model":{"r_curve":{"times":[0.0, 1.0, 2.0], "rates":[0.05, 0.05, 0.05]}},
+  "grid":{"T":2.0},
+  "S0":[],
+  "product":{"type":"zcb","notional":1.0,"T":2.0}
+}
+
+# (IR2) FRA (T1->T2)
+spec_fra = {
+  "engine":"analytic",
+  "model":{"r_curve":{"times":[0.0,1.0,2.0],"rates":[0.05,0.05,0.05]}},
+  "product":{"type":"fra","T1":1.0,"T2":2.0,"tau":1.0,"K":0.05,"notional":1e6}
+}
+
+# (IR3) Swap PV e taxa par
+spec_swap = {
+  "engine":"analytic",
+  "model":{"r_curve":{"times":[0,1,2,3,4,5],"rates":[0.05]*5}},
+  "product":{"type":"swap","T0":0.0,"payment_times":[1,2,3,4,5],
+             "tau":1.0,"fixed_rate":0.052,"notional":1e6}
+}
+# Para taxa par, defina "par":true e omita "fixed_rate" => PV ~ 0.
+
+# (IR4) Cap (soma de caplets Black-76)
+spec_cap = {
+  "engine":"analytic",
+  "model":{"r_curve":{"times":[0,1,2,3],"rates":[0.05,0.05,0.05]},
+           "sigma":0.20},  # Black vol
+  "product":{"type":"cap","payment_times":[1,2,3],"tau":1.0,"K":0.05,
+             "reset_times":[0,1,2], "notional":1e6}
+}
+
+# (IR5) Swaption pagadora Black-76
+spec_swpt = {
+  "engine":"analytic",
+  "model":{"r_curve":{"times":[0,1,2,3,4,5],"rates":[0.05]*5},"sigma":0.25},
+  "product":{"type":"payer_swaption","expiry":2.0,"payment_times":[3,4,5],
+             "tau":1.0,"K":0.05,"notional":1e6}
+}
+\end{lstlisting}
 
 \subsection{Precisão \& Performance: \emph{knobs} práticos}
 \begin{center}
@@ -240,22 +290,30 @@ Backend & Parâmetro & Efeito prático \\
 \midrule
 MC & \texttt{n\_paths} & SE $\propto 1/\sqrt{N}$; mais paths $\Rightarrow$ erro menor (custo linear). \\
 MC & \texttt{steps} & Menor bias temporal em path-dep./LSMC; custo $\propto$ paths $\times$ steps. \\
-MC & \texttt{seed} & Reprodutibilidade (use CRN p/ Greeks). \\
 PDE & \texttt{NS, NT} & Convergência $\mathcal O(\Delta t + \Delta S^2)$; aumente malha até estabilizar. \\
-PDE & \texttt{Smax\_mult} & Domínio $[0, S_{\max}]$; use 5–7 vezes o strike como regra inicial. \\
-FFT & $\alpha$ & Damping (1–2 típico). Muito baixo/alto pode instabilizar. \\
-FFT & $N$, $\eta$ & Resolução em frequência/strike; aumente $N$ para malha mais densa. \\
+PDE & \texttt{Smax\_mult} & Domínio $[0, S_{\max}]$; use 5–7 vezes o strike inicial. \\
+FFT & $\alpha, N, \eta$ & Damping e resolução em frequência/strike (ver seção Heston). \\
+IR & \texttt{sigma} & Vol Black para cap/floor/swaption. Maturidade usada no $d_{1,2}$ é o tempo até reset/expiração. \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\section{Validação, testes e reprodutibilidade}
+\section{Validação, paridades e reprodutibilidade}
 \begin{itemize}[leftmargin=1.2em]
 \item \textbf{Consistência BS}: MC (GBM) $\approx$ Black--Scholes (dentro de $k\cdot\mathrm{SE}$).
 \item \textbf{PDE vs BS}: put europeu CN $\approx$ BS; americano PDE $\ge$ europeu.
-\item \textbf{Propriedades}: up\&out $\le$ vanilla; Bermudan com janelas mais densas $\nearrow$ American.
+\item \textbf{Propriedades path-dep.}: up\&out $\le$ vanilla; Asiática $\le$ vanilla (mesma $K$).
+\item \textbf{LSMC}: Bermudas com janelas mais densas $\nearrow$ Americana.
 \item \textbf{Heston}: MC $\approx$ FFT (tolerância baseada em SE).
+\item \textbf{IR (paridades)}:
+  \begin{itemize}[nosep]
+  \item \emph{Cap--Floor parity}: $\mathrm{Cap}(K)-\mathrm{Floor}(K)=\mathrm{PV}(\text{payer swap com taxa }K)$.
+  \item \emph{Swap par}: para $K=K^\star$, $\mathrm{PV}^{\mathrm{swap}}\approx 0$.
+  \item \emph{FRA}: usando $F_i$ da curva, $\mathrm{PV}^{\mathrm{FRA}} = N D(0,T_{i+1}) \tau_i (F_i-K)$.
+  \end{itemize}
 \end{itemize}
+
+\paragraph{Execução dos testes.}
 \begin{verbatim}
 # Windows
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD="1"
@@ -266,9 +324,7 @@ python -m pytest -q
 
 \subsection{(E1) Europeu: MC vs Black--Scholes}
 \begin{lstlisting}[style=pystyle]
-from math import exp
 from derivx import price_from_spec, bs_call_price
-
 S0=K=100.0; r=0.05; q=0.0; sigma=0.2; T=1.0
 spec = {"engine":"mc","model":{"name":"gbm","r":r,"q":q,"sigma":sigma},
         "grid":{"T":T,"steps":128},"S0":[S0],
@@ -307,7 +363,7 @@ asian,_= price_from_spec({**base,"product":{"style":"european","type":"asian_ari
 print(f"Asian={asian:.4f} <= Vanilla={van:.4f}")
 \end{lstlisting}
 
-\subsection{(E5) Bermudana (LSMC): frequência de exercício}
+\subsection{(E5) Bermudas (LSMC): frequência de exercício}
 \begin{lstlisting}[style=pystyle]
 def berm(ex_every):
   spec={"engine":"mc","model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
@@ -345,20 +401,30 @@ p,se=price_from_spec(spec)
 print(p, "±", 1.96*se)
 \end{lstlisting}
 
-\subsection{(E8) Greeks por \emph{bump \& revalue} (CRN)}
+\subsection{(E8) IR: paridade Cap--Floor e taxa par de swap}
 \begin{lstlisting}[style=pystyle]
-import numpy as np
-base={"engine":"mc","model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
-      "grid":{"T":1.0,"steps":256},"S0":[100.0],
-      "product":{"style":"european","type":"european_call","asset":0,"K":100.0},
-      "n_paths":120_000,"seed":11}
-def price(spec): from derivx import price_from_spec; return price_from_spec(spec)[0]
-h=1.0
-p0=price(base)
-pU=price({**base,"S0":[100.0+h]})
-pD=price({**base,"S0":[100.0-h]})
-delta=(pU-pD)/(2*h); gamma=(pU-2*p0+pD)/(h*h)
-print("Delta~",delta,"Gamma~",gamma)
+from derivx import price_from_spec
+r_curve = {"times":[0,1,2,3,4,5], "rates":[0.05]*5}
+base = {"engine":"analytic","model":{"r_curve":r_curve}}
+
+cap = {**base, "product":{"type":"cap","payment_times":[1,2,3,4,5], "tau":1.0,
+                          "reset_times":[0,1,2,3,4], "K":0.05, "notional":1e6},
+       "model":{**base["model"], "sigma":0.20}}
+floor= {**base, "product":{"type":"floor","payment_times":[1,2,3,4,5], "tau":1.0,
+                           "reset_times":[0,1,2,3,4], "K":0.05, "notional":1e6},
+        "model":{**base["model"], "sigma":0.20}}
+swap = {**base, "product":{"type":"swap","T0":0.0,"payment_times":[1,2,3,4,5],
+                           "tau":1.0, "fixed_rate":0.05, "notional":1e6}}
+
+pc,_ = price_from_spec(cap)
+pf,_ = price_from_spec(floor)
+ps,_ = price_from_spec(swap)
+print("Cap-Floor ~ Swap PV:", pc - pf, "~", ps)
+
+swap_par = {**base, "product":{"type":"swap","T0":0.0,"payment_times":[1,2,3,4,5],
+                               "par":True, "tau":1.0, "notional":1e6}}
+p_par,_ = price_from_spec(swap_par)
+print("Swap par PV ~ 0:", p_par)
 \end{lstlisting}
 
 \section{Estrutura do repositório (resumo)}
@@ -371,19 +437,29 @@ src/derivx/
   engine/fft.py       # Heston FFT (Carr-Madan)
   exercise/lsmc.py    # LSMC genérico
   payoffs/core.py     # PF utilitários (terminal, média, etc.)
+  payoffs/extra.py    # Digitais/Gap/Exchange (PF)
+  ir/black76.py       # ZCB, FRA, Swap, Cap/Floor, Swaption (Black-76)
+  analytic/bs.py      # Φ, d1d2, BS
+  analytic/haug.py    # Digitais, Gap, Margrabe (closed-form)
   dsl/spec.py         # mapeia dict -> engine/produto
-tests/                # sanity e propriedades
+tests/                # sanity, propriedades e referências (BS/Haug/IR)
 examples/             # scripts reprodutíveis
 \end{verbatim}
 
 \section{Licença e aviso}
 MIT. Uso acadêmico/educacional; valide premissas, calibração e risco de modelo antes de produção.
+Notas: módulo IR assume \emph{single-curve} (mesma curva para desconto e forwards) e convenções simples ($\tau$ como ano de ACT/360=1.0, etc.).
+Agendas e day-count mais realistas podem ser conectadas externamente; multi-curve e convexity adjustments não estão incluídos.
 
 \section*{Referências}
 \noindent
 Black, F.; Scholes, M. (1973) \emph{The Pricing of Options and Corporate Liabilities}.\\
+Black, F. (1976) \emph{The Pricing of Commodity Contracts}.\\
+Brigo, D.; Mercurio, F. (2006) \emph{Interest Rate Models -- Theory and Practice}.\\
+Hull, J. (2018) \emph{Options, Futures, and Other Derivatives}.\\
 Longstaff, F.; Schwartz, E. (2001) \emph{Valuing American Options by Simulation}.\\
 Carr, P.; Madan, D. (1999) \emph{Option Valuation Using the FFT}.\\
 Heston, S. (1993) \emph{A Closed-Form Solution for Options with Stochastic Volatility}.\\
-Margrabe, W. (1978) \emph{The Value of an Option to Exchange One Asset for Another}.
+Margrabe, W. (1978) \emph{The Value of an Option to Exchange One Asset for Another}.\\
+Haug, E. G. (2006) \emph{The Complete Guide to Option Pricing Formulas}.
 \end{document}
