@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "derivx"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Generic derivative pricer via composable building blocks (MC + LSMC)"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [{ name = "Walter C Neto" }]
@@ -36,6 +36,7 @@ Issues = "https://github.com/<seu-usuario>/derivx/issues"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
+version = { attr = "derivx._version.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

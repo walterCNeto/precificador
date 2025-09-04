@@ -1,4 +1,6 @@
-﻿from .curves import PiecewiseFlatCurve
+﻿from ._version import __version__  # <- única fonte de verdade
+
+from .curves import PiecewiseFlatCurve
 from .models.gbm import RiskNeutralGBM
 from .engine.montecarlo import MonteCarloEngine
 from .exercise.lsmc import ExerciseSpec
