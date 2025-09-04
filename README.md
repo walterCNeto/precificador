@@ -5,16 +5,16 @@
 **Precificador geral de derivativos por blocos de construção**
 
 - **Modelo sob Q** (GBM multiativo com correlação; `r(t)`, `q_i(t)`, `σ_i(t)`)
-- **Numerário** *piecewise-flat* (desconto determinístico exato por trechos)
+- **Numerário** piecewise-flat (desconto determinístico exato por trechos)
 - **Payoffs PF** (funcionais de trajetória): terminal, média, máx/mín, basket, barreira…
-- **Exercício** Europeu, Bermudano, Americano (LSMC robusto com *cross‑fit* e desconto correto por janela)
+- **Exercício** Europeu, Bermudano, Americano (LSMC robusto)
 - **PDE 1D** (Crank–Nicolson) para vanillas (inclui Americano via projeção)
 - **FFT (Heston)** para europeias (Carr–Madan)
 - **Analítico (Haug/Margrabe)**: Digitais, Gap, Exchange
-- **Juros (Black‑76)**: ZCB, FRA, Swap, Cap, Floor, Payer/Receiver Swaption (analítico)
+- **Renda Fixa (IR / Black‑76)**: ZCB, FRA, Swap (PV/par rate), **Cap/Floor**, **Swaptions payer/receiver**
 - **DSL** declarativa (dict/JSON) para montar produto e precificar
+- **Visualização** de payoff + inputs + equações + preço (via `plot_report`)
 - **Testes** e CI prontos (pytest + GitHub Actions)
-- **One‑click** para rodar testes + commit + sync + push (Windows PowerShell)
 
 ---
 
@@ -26,6 +26,7 @@
 - [Usando a DSL (`price_from_spec`)](#usando-a-dsl-price_from_spec)
 - [Exemplos práticos](#exemplos-práticos)
 - [Produtos suportados](#produtos-suportados)
+- [Visualização (plot_report)](#visualização-plot_report)
 - [Validação & testes](#validação--testes)
 - [Dicas de precisão & performance](#dicas-de-precisão--performance)
 - [Estrutura do repositório](#estrutura-do-repositório)
@@ -39,20 +40,26 @@
 
 > Requisitos: Python 3.11+ (testado). A instalação em modo **dev** já traz dependências de testes.
 
-**Windows (PowerShell)**
+**Windows (PowerShell):**
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
+# opcional para relatórios/plots:
+pip install matplotlib
+# executar testes (desabilita plugins externos do pytest)
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD = "1"
 python -m pytest -q
 ```
 
-**macOS / Linux (bash/zsh)**
+**macOS / Linux (bash/zsh):**
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
+# opcional para relatórios/plots:
+pip install matplotlib
+# executar testes (desabilita plugins externos do pytest)
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
 ```
 
@@ -80,18 +87,18 @@ print("BS:", bs_call_price(100, 100, r=0.05, q=0.0, sigma=0.2, T=1.0))
 
 ## Visão de arquitetura
 
-- **Curva (numerário)** — `PiecewiseFlatCurve` implementa \( r(t) \) *piecewise‑flat*, com **desconto exato** por trechos  
-  \( DF(t_0,t_1)=\exp\{-\int_{t_0}^{t_1} r(u)\,du\} \).
-- **Modelos sob \(\mathbb{Q}\)**  
-  `RiskNeutralGBM` (multiativo; `q_i(t)`, `σ_i(t)`, correlação via Cholesky) e **Heston** (europeias) — MC/FFT.
-- **Payoffs PF (funcionais de trajetória)** — utilitários vetorizados: terminal, médias, running max/min, barreiras, cestas…
-- **Motores numéricos**
-  - **MC**: simulação GBM/Heston, antitético e (opcional) *control variate*;
-  - **PDE CN 1D**: vanillas (europeias e americanas);
-  - **FFT (Heston)**: precifica vários strikes de uma vez;
-  - **Analítico**: fórmulas fechadas (digitais, gap, exchange; *Black‑76* em juros).
-- **Exercício (LSMC)** — regressão do valor de continuação em *features* (padrão `log S`, base polinomial até grau 2 + cruzados).
-- **DSL** — `price_from_spec(spec)` mapeia um dicionário JSON para engine, grade temporal e produto.
+- **Curva (numerário):** `PiecewiseFlatCurve` implementa \( r(t) \) *piecewise-flat*, com **desconto exato** por trechos \( DF(t_0,t_1)=\exp\{-\int_{t_0}^{t_1} r(u)\,du\} \).
+- **Modelos sob \( \mathbb{Q} \):**
+  - `RiskNeutralGBM` (multiativo; `q_i(t)`, `σ_i(t)`, correlação via Cholesky)
+  - Heston (europeias) — MC e FFT (Carr–Madan)
+- **Payoffs PF (funcionais de trajetória):** utilitários vetorizados para terminal, médias, running max/min, barreiras, cestas…
+- **Motores numéricos:**
+  - **MC**: simulação GBM/Heston, antitético e (opcional) control variate
+  - **PDE CN 1D**: vanillas (europeias/americanas)
+  - **FFT (Heston)**: preços para vários strikes
+  - **Analítico**: fórmulas fechadas (digitais, gap, exchange; IR Black‑76)
+- **Exercício (LSMC):** regressão do valor de continuação em features (padrão: `log S` com base polinomial até grau 2 + cruzados)
+- **DSL:** `price_from_spec(spec)` mapeia um dicionário JSON para engine, grade temporal e produto.
 
 ---
 
@@ -101,20 +108,20 @@ print("BS:", bs_call_price(100, 100, r=0.05, q=0.0, sigma=0.2, T=1.0))
 
 - **`engine`**: `"mc"` | `"pde"` | `"fft"` | `"analytic"` | `"auto"`  
   *`auto` tenta analítico/PDE/FFT quando aplicável; senão cai para MC.*
-- **`model`**
-  - GBM: `{"name":"gbm","r":...,"q":...,"sigma":...,"corr":...}`
+- **`model`**:
+  - GBM: `{"name":"gbm", "r":..., "q":..., "sigma":..., "corr":...}`
   - Heston: `{"name":"heston","r":...,"q":...,"kappa":...,"theta":...,"xi":...,"rho":...,"v0":...}`
-  - Juros (Black‑76 analítico): `{"r_curve":{"times":[...],"rates":[...]}}`
-- **`grid`**
+  - IR flat: `{"r": 0.05}` (ou use `r_curve` para curva por trechos)
+- **`grid`**:
   - MC: `{"T":..., "steps":...}` (uniforme)
-  - PDE/FFT: usa `{"T":...}` (demais *knobs* são específicos do engine)
-- **`S0`**: lista de preços iniciais (uma entrada por ativo)
-- **`product`**
-  - `style`: `"european"` | `"bermudan"` | `"american"` (LSMC ou PDE)
+  - PDE/FFT/Analítico: usa `{"T":...}` quando aplicável
+- **`S0`**: lista de preços iniciais (uma entrada por ativo; em IR puro pode ser vazio `[]`)
+- **`product`**:
+  - `style`: `"european"` | `"bermudan"` | `"american"`
   - `type`: ver [Produtos suportados](#produtos-suportados)
   - Parametrização conforme o tipo (`asset`, `K`, `barrier`, `weights`, …)
   - Exercício (bermudan): `exercise_idx`, `exercise_times` **ou** `exercise_every`
-- **Parâmetros do motor**
+- **Parâmetros do motor**:
   - MC: `n_paths`, `seed`
   - PDE: `NS`, `NT`, `Smax_mult`
   - FFT: `alpha`, `N`, `eta`
@@ -157,7 +164,7 @@ pa,_ = price_from_spec(amer)
 print(f"PDE euro={pe:.4f}  PDE amer={pa:.4f}  (amer >= euro)")
 ```
 
-### 3) Barreira *up‑and‑out* (monotonia)
+### 3) Barreira up-and-out (monotonia)
 ```python
 base = {"engine":"mc","model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
         "grid":{"T":1.0,"steps":128},"S0":[100.0],
@@ -219,20 +226,6 @@ print(p, "±", 1.96*se)
 ```
 
 ### 8) Analítico (Haug/Margrabe) — Digitais, Gap, Exchange
-
-**Digitais (Haug) — MC (paga no vencimento)**
-```json
-{
-  "engine":"mc",
-  "model":{"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
-  "grid":{"T":1.0,"steps":256},
-  "S0":[100.0],
-  "product":{"style":"european","type":"cash_or_nothing_call","asset":0,"K":100.0,"cash":1.0},
-  "n_paths":200000,"seed":11
-}
-```
-
-**Digitais (Analítico)**
 ```json
 {
   "engine":"analytic",
@@ -243,83 +236,50 @@ print(p, "±", 1.96*se)
 }
 ```
 
-**Gap (Haug)**
-```json
-{
-  "engine":"analytic",
-  "model":{"r":0.05,"q":[0.0],"sigma":[0.2],"corr":[[1.0]]},
-  "grid":{"T":1.0},
-  "S0":[100.0],
-  "product":{"style":"european","type":"gap_call","asset":0,"K1":95.0,"K2":100.0}
+### 9) Renda Fixa (IR, Black‑76): FRA, Swap (PV/par), Cap/Floor, Swaptions
+**FRA (PV)**
+```python
+spec = {
+  "engine": "analytic",
+  "model": {"r": 0.05},   # ou r_curve: {"times":[...], "rates":[...]}
+  "grid": {"T": 1.0},
+  "S0": [],
+  "product": {"style":"european","type":"fra","T1":1.0,"T2":1.5,"tau":0.5,"K":0.045,"notional":1.0}
 }
+pv,_ = price_from_spec(spec)
 ```
 
-**Margrabe (exchange)**
-```json
-{
-  "engine":"analytic",
-  "model":{"r":0.05,"q":[0.01,0.03],"sigma":[0.20,0.30],"corr":[[1.0,0.5],[0.5,1.0]]},
-  "grid":{"T":1.0},
-  "S0":[100.0,120.0],
-  "product":{"style":"european","type":"exchange_call","asset_long":0,"asset_short":1}
-}
-```
-
-### 9) Juros (Black‑76 — analítico)
-
-**ZCB**
-```json
-{
-  "engine":"analytic",
-  "model":{"r_curve":{"times":[0.5,1.0,2.0],"rates":[0.05,0.052,0.055]}},
-  "product":{"style":"european","type":"zcb","T":2.0,"notional":1.0}
-}
-```
-
-**FRA**
-```json
-{
-  "engine":"analytic",
-  "model":{"r_curve":{"times":[0.5,1.0,2.0],"rates":[0.05,0.052,0.055]}},
-  "product":{"style":"european","type":"fra","T1":1.0,"T2":1.5,"tau":0.5,"K":0.055,"notional":1e6}
-}
-```
-
-**Swap (PV de *fixed‑for‑float*)**
-```json
-{
-  "engine":"analytic",
-  "model":{"r_curve":{"times":[0.5,1.0,1.5,2.0,2.5,3.0],"rates":[0.05,0.052,0.053,0.054,0.055,0.056]}},
+**Swap (PV)**
+```python
+spec = {
+  "engine":"analytic","model":{"r":0.05},"grid":{"T":2.0},"S0":[],
   "product":{"style":"european","type":"swap","T0":0.0,
-             "payment_times":[0.5,1.0,1.5,2.0,2.5,3.0],"tau":0.5,
-             "fixed_rate":0.055,"notional":1e6}
+             "payment_times":[0.5,1.0,1.5,2.0],
+             "tau":0.5, "fixed_rate":0.05, "notional":1.0}
 }
+pv,_ = price_from_spec(spec)
 ```
 
-**Cap / Floor (soma de caplets/floorlets — Black‑76)**  
-(*`sigma` aqui é a vol de Black‑76 do forward de cada período; pode ser constante.*)
-```json
-{
-  "engine":"analytic",
-  "model":{"r_curve":{"times":[0.5,1.0,1.5,2.0],"rates":[0.05,0.052,0.053,0.055]}},
+**Cap (soma de caplets via Black‑76)**
+```python
+spec = {
+  "engine":"analytic","model":{"r":0.05},"grid":{"T":2.0},"S0":[],
   "product":{"style":"european","type":"cap",
-             "payment_times":[0.5,1.0,1.5,2.0],"tau":0.5,
-             "K":0.06,"sigma":0.25,"notional":1e6}
+             "payment_times":[0.5,1.0,1.5,2.0],
+             "tau":0.5,"K":0.04,"sigma":0.20,"notional":1.0}
 }
+pv,_ = price_from_spec(spec)
 ```
 
-**Swaption Payer / Receiver (Black‑76 com PVBP como *numéraire*)**
-```json
-{
-  "engine":"analytic",
-  "model":{"r_curve":{"times":[0.5,1.0,1.5,2.0,2.5,3.0],"rates":[0.05,0.052,0.053,0.054,0.055,0.056]}},
+**Swaption payer (Black‑76 no swap subjacente)**
+```python
+spec = {
+  "engine":"analytic","model":{"r":0.05},"grid":{"T":2.0},"S0":[],
   "product":{"style":"european","type":"payer_swaption","expiry":1.0,
-             "payment_times":[1.5,2.0,2.5,3.0],"tau":0.5,
-             "K":0.055,"sigma":0.20,"notional":1e6}
+             "payment_times":[1.5,2.0,2.5],"tau":0.5,"K":0.05,"sigma":0.25,"notional":1.0}
 }
+pv,_ = price_from_spec(spec)
 ```
-
-> Dica: `engine: "auto"` tenta analítico quando suportado; caso contrário, cai para MC/PDE/FFT.
 
 ---
 
@@ -327,54 +287,94 @@ print(p, "±", 1.96*se)
 
 ✔️ = implementado / OK
 
-**Vanillas (GBM)**  
-✔️ `european_call`, `european_put` (MC e PDE)  
-✔️ Americano (put/call) via PDE 1D (Crank–Nicolson)  
-✔️ Bermudano (LSMC) com `exercise_every`, `exercise_idx` ou `exercise_times`
+**Vanillas (GBM)**
+- ✔️ `european_call`, `european_put` (MC e PDE)
+- ✔️ Americano (put/call) via PDE 1D (Crank–Nicolson)
+- ✔️ Bermudano (LSMC) com `exercise_every`, `exercise_idx` ou `exercise_times`
 
-**Path‑dependentes (GBM)**  
-✔️ `asian_arith_call`  
-✔️ Barreira: `up_and_out_call` (outros tipos na fila)
+**Path-dependentes (GBM)**
+- ✔️ `asian_arith_call`
+- ✔️ Barreira: `up_and_out_call` (outros tipos na fila)
 
-**Multi‑ativo (GBM)**  
-✔️ `basket_call` (pesos arbitrários)  
-✔️ `exchange_call` (Margrabe, 2 ativos)
+**Multi-ativo (GBM)**
+- ✔️ `basket_call` (pesos arbitrários)
+- ✔️ `exchange_call` (Margrabe, 2 ativos)
 
-**Analíticos (Haug/Margrabe)**  
-✔️ Digitais: `cash_or_nothing_call|put`, `asset_or_nothing_call|put`  
-✔️ Gap: `gap_call`, `gap_put`  
-✔️ Exchange (Margrabe): `exchange_call`
+**Analíticos (Haug/Margrabe)**
+- ✔️ Digitais: `cash_or_nothing_call|put`, `asset_or_nothing_call|put`
+- ✔️ Gap: `gap_call`, `gap_put`
+- ✔️ Exchange (Margrabe): `exchange_call`
 
-**Juros (Black‑76 — analítico)**  
-✔️ `zcb`, `fra`, `swap`, `cap`, `floor`, `payer_swaption`, `receiver_swaption`
+**Heston**
+- ✔️ Europeias (FFT Carr–Madan; MC)
 
-**Heston**  
-✔️ Europeias (FFT Carr–Madan; MC)
+**Renda Fixa (IR / Black‑76)**
+- ✔️ `zcb`, `fra`, `swap` (PV/par rate), `cap`, `floor`, `payer_swaption`, `receiver_swaption`
 
-**Roadmap curto**  
-Digitais/barreiras adicionais (*up/down, in/out, rebates*); Asians put, lookbacks, cliquets; Greeks *pathwise*/LRM; calibração Heston/GBM.
+**Roadmap curto**
+- Digitais/barreiras adicionais (up/down, in/out, rebates)
+- Asians put, lookbacks, cliquets
+- Greeks pathwise/LRM
+- Calibração Heston/GBM (smiles/term-structure)
+
+---
+
+## Visualização (`plot_report`)
+
+O módulo `derivx.report.plot` gera uma **figura PNG** com:
+1) **Curva de payoff** (quando aplicável – ex.: vanilla, digital, asiática estimada)
+2) **Inputs** do spec (parâmetros usados no preço)
+3) **Equações** (payoff + fórmula de precificação, quando disponível)
+4) **Preço** (e **SE** se for MC)
+
+**Instale a dependência opcional:**
+```bash
+pip install matplotlib
+```
+
+**Exemplo (vanilla call, analítico):**
+```python
+from derivx.report import plot_report
+
+spec = {
+  "engine": "analytic",
+  "model": {"r": 0.05, "q": [0.0], "sigma": [0.2], "corr": [[1.0]]},
+  "grid": {"T": 1.0},
+  "S0": [100.0],
+  "product": {"style": "european", "type": "european_call", "asset": 0, "K": 100.0},
+}
+
+rep = plot_report(spec, filename="report_call.png", dpi=150)
+print("Preço:", rep.price, "SE:", rep.se, "PNG:", rep.png_path)
+```
+
+**Gerar relatórios de exemplo via pytest (salvos em uma pasta temporária):**
+```bash
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/report -q
+# Os PNGs são criados em diretórios temporários de teste (impressos no log se um teste falhar).
+```
 
 ---
 
 ## Validação & testes
 
-- **Consistência BS:** MC (GBM) ≈ Black–Scholes (dentro de *k·SE*)  
-- **PDE vs BS:** put europeu CN ≈ BS; americano PDE ≥ europeu  
-- **Monotonicidades:** *up&out* ≤ vanilla; Bermudano densificando → Americano  
-- **Heston:** MC ≈ FFT (tolerância baseada em SE)  
+- **Consistência BS:** MC (GBM) ≈ Black–Scholes (dentro de _k·SE_)
+- **PDE vs BS:** put europeu CN ≈ BS; americano PDE ≥ europeu
+- **Monotonicidades:** up&out ≤ vanilla; Bermudano densificando → Americano
+- **Heston:** MC ≈ FFT (tolerância baseada em SE)
 - **Analíticos (Haug/Margrabe/Black‑76):** testes de referência com fórmulas fechadas
 
-Rodar todos os testes (desabilitando plugins externos do PyTest):
+Rode todos os testes (desabilitando plugins externos do PyTest):
 ```powershell
 # Windows
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD="1"
 python -m pytest -q
 ```
 
-**One‑click (Windows)**  
+**One-click (Windows):**
 ```powershell
-.\scripts\oneclick.ps1
-# Roda testes, faz commit (se houver mudanças), puxa e dá push
+# roda testes, faz commit (se houver mudanças), puxa e dá push
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\oneclick.ps1
 ```
 
 ---
@@ -384,14 +384,17 @@ python -m pytest -q
 | Backend | Parâmetro   | Efeito |
 |---|---|---|
 | MC  | `n_paths` | SE ∝ 1/√N (custo linear) |
-| MC  | `steps`   | Reduz viés temporal (path‑dep./LSMC); custo ∝ paths×steps |
+| MC  | `steps`   | Reduz viés temporal (path-dep./LSMC); custo ∝ paths×steps |
 | PDE | `NS`, `NT` | Convergência O(Δt + ΔS²); aumente até estabilizar |
 | PDE | `Smax_mult` | Domínio \[0, S_max]; comece com 5–7×K |
-| FFT | `alpha`   | *Damping* (1–2 típico); extremos podem instabilizar |
+| FFT | `alpha`   | Damping (1–2 típico); extremos podem instabilizar |
 | FFT | `N`, `eta` | Resolução em frequência/strike |
 
-**LSMC — boas práticas**  
-Regressão apenas em ITM; desconto correto entre janelas (Δt múltiplos); *cross‑fit* A/B; checar monotonia (Bermudano ↑ com mais janelas).
+**LSMC – boas práticas**
+- Regressão apenas em ITM
+- Desconto correto entre janelas (Δt múltiplos)
+- Cross-fit A/B para reduzir overfit
+- Checar monotonia (Bermudano ↑ conforme mais janelas)
 
 ---
 
@@ -410,11 +413,12 @@ src/derivx/
   payoffs/extra.py        # Digitais, Gap, Exchange, etc. (PF)
   analytic/bs.py          # Φ, d1d2, BS
   analytic/haug.py        # Digitais, Gap, Margrabe (closed-form)
-  ir/black76.py           # Juros: ZCB, FRA, Swap, Cap/Floor, Swaptions
+  ir/black76.py           # ZCB, FRA, swap PV/par, cap/floor, swaptions (Black-76)
   dsl/spec.py             # Mapeia dict -> engine/produto
+  report/plot.py          # plot_report: payoff + inputs + equações + preço
 tests/
-  ref_formulas/           # testes de referência (BS/Haug/Margrabe/Black-76)
-  reference/
+  reference/              # testes de referência (BS/Haug/Margrabe/Black-76…)
+  report/                 # smoke tests de plot_report
 scripts/
   oneclick.ps1            # roda testes + commit + sync + push
 README.md
@@ -427,21 +431,24 @@ README.md
 1. Crie um branch: `git checkout -b feat/minha-feature`  
 2. Adicione testes em `tests/`  
 3. Garanta **`python -m pytest -q`** verde  
-4. Abra um Pull Request (escopo, resultados esperados, validação)
+4. Abra um Pull Request (descrevendo escopo, resultados esperados e validação)
 
-**Padrões**  
-Estilo PEP 8 / tipagem leve; funções puras e vetorização; documente decisões numéricas (PDE BCs, FFT *knobs*, etc.).
+**Padrões**
+- Estilo PEP 8 / tipagem leve
+- Funções puras e vetorização onde possível
+- Documentar decisões numéricas (condições de contorno PDE, escolhas FFT…)
 
 ---
 
 ## Referências
 
-- Black, F.; Scholes, M. (1973) *The Pricing of Options and Corporate Liabilities*
-- Longstaff, F.; Schwartz, E. (2001) *Valuing American Options by Simulation*
-- Carr, P.; Madan, D. (1999) *Option Valuation Using the FFT*
-- Heston, S. (1993) *A Closed-Form Solution for Options with Stochastic Volatility*
-- Margrabe, W. (1978) *The Value of an Option to Exchange One Asset for Another*
-- Haug, E. G. (2006) *The Complete Guide to Option Pricing Formulas*
+- Black, F.; Scholes, M. (1973) *The Pricing of Options and Corporate Liabilities*  
+- Longstaff, F.; Schwartz, E. (2001) *Valuing American Options by Simulation*  
+- Carr, P.; Madan, D. (1999) *Option Valuation Using the FFT*  
+- Heston, S. (1993) *A Closed-Form Solution for Options with Stochastic Volatility*  
+- Margrabe, W. (1978) *The Value of an Option to Exchange One Asset for Another*  
+- Haug, E. G. (2006) *The Complete Guide to Option Pricing Formulas*  
+- Black, F. (1976) *The Pricing of Commodity Contracts* (Black‑76)
 
 ---
 
