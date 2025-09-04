@@ -3,45 +3,48 @@ requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "derivx"
+name = "derivx-quant"
+description = "Precificador de derivativos (equities/IR) com MC/LSMC, PDE e FFT + DSL."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Walter C. Neto" }]
 dynamic = ["version"]
-description = "Generic derivative pricer via composable building blocks (MC + LSMC)"
-readme = { file = "README.md", content-type = "text/markdown" }
-authors = [{ name = "Walter C Neto" }]
-license = { file = "LICENSE.txt" }
-requires-python = ">=3.9"
-dependencies = ["numpy>=1.22"]
+
 classifiers = [
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Intended Audience :: Financial and Insurance Industry",
-  "Topic :: Office/Business :: Financial :: Investment",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Office/Business :: Financial",
+]
+
+# Dependências mínimas em runtime
+dependencies = [
+  "numpy>=1.24",
 ]
 
 [project.optional-dependencies]
+# para os relatórios/plots
+viz = ["matplotlib>=3.7"]
+# para desenvolvimento
 dev = [
   "pytest>=7",
-  "black>=23",
-  "ruff>=0.4",
-  "matplotlib>=3.7"
+  "pytest-cov",
+  "build",
+  "twine",
+  "ruff",
+  "black",
 ]
-
-[project.urls]
-Homepage = "https://github.com/<seu-usuario>/derivx"
-Issues = "https://github.com/<seu-usuario>/derivx/issues"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
-version = { attr = "derivx._version.__version__" }
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["derivx*"]
 
-[tool.ruff]
-line-length = 100
-target-version = "py39"
+[tool.setuptools.dynamic]
+version = { attr = "derivx._version.__version__" }
