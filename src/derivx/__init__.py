@@ -19,8 +19,8 @@ bs_call_price,
 )
 from .dsl.spec import price_from_spec, build_engine_from_spec
 
-
 __all__ = [
+"__version__",
 "PiecewiseFlatCurve",
 "RiskNeutralGBM",
 "MonteCarloEngine",
