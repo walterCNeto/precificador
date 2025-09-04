@@ -1,47 +1,38 @@
-[build-system]
-requires = ["setuptools>=61", "wheel"]
+﻿[build-system]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "derivx-quant"
-description = "Precificador de derivativos (equities/IR) com MC/LSMC, PDE e FFT + DSL."
-readme = "README.md"
-requires-python = ">=3.11"
-license = { text = "MIT" }
-authors = [{ name = "Walter C. Neto" }]
+name = "derivx-precificador"
 dynamic = ["version"]
+description = "Precificador de derivativos em Python (MC/LSMC, PDE CN, FFT Heston, IR Black-76) com DSL declarativa."
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [{ name = "Walter C. Neto" }]
+license = { text = "MIT" }
+requires-python = ">=3.11"
+keywords = ["options", "derivatives", "pricing", "Monte Carlo", "LSMC", "PDE", "FFT", "Heston", "Black76", "DSL"]
 
-classifiers = [
-  "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
-  "Intended Audience :: Science/Research",
-  "Topic :: Scientific/Engineering :: Mathematics",
-  "Topic :: Office/Business :: Financial",
-]
-
-# Dependências mínimas em runtime
 dependencies = [
-  "numpy>=1.24",
+  "numpy>=1.26",
+  "scipy>=1.11",
 ]
 
 [project.optional-dependencies]
-# para os relatórios/plots
-viz = ["matplotlib>=3.7"]
-# para desenvolvimento
 dev = [
-  "pytest>=7.0",
-  "pytest-cov">=4.1,
+  "pytest>=7",
+  "pytest-cov>=4",
   "matplotlib>=3.8",
-  "build",
-  "twine",
-  "ruff",
-  "black",
+  "build>=1.2",
+  "twine>=5.0",
 ]
 
-[tool.setuptools]
-package-dir = { "" = "src" }
-include-package-data = true
+[project.urls]
+Homepage = "https://github.com/walterCNeto/precificador"
+Repository = "https://github.com/walterCNeto/precificador"
+Issues = "https://github.com/walterCNeto/precificador/issues"
+
+[tool.setuptools.package-dir]
+"" = "src"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -49,3 +40,9 @@ include = ["derivx*"]
 
 [tool.setuptools.dynamic]
 version = { attr = "derivx._version.__version__" }
+
+[tool.pytest.ini_options]
+addopts = "-q"
+markers = [
+  "slow: testes mais demorados",
+]
