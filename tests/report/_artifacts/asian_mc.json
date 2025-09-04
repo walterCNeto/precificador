@@ -1,0 +1,43 @@
+{
+  "price": 5.7716228306187105,
+  "se": 0.05646083926128083,
+  "inputs": {
+    "engine": "mc",
+    "S0": [
+      100.0
+    ],
+    "grid": {
+      "T": 1.0,
+      "steps": 128,
+      "NS": null,
+      "NT": null,
+      "Smax_mult": null,
+      "alpha": null,
+      "N": null,
+      "eta": null
+    },
+    "model": {
+      "name": "gbm",
+      "r": 0.05,
+      "q": 0.0,
+      "sigma": 0.2,
+      "corr": null,
+      "kappa": null,
+      "theta": null,
+      "xi": null,
+      "rho": null,
+      "v0": null
+    },
+    "product": {
+      "style": "european",
+      "type": "asian_arith_call",
+      "asset": 0,
+      "K": 100.0
+    },
+    "n_paths": 20000,
+    "seed": 7
+  },
+  "payoff_equation_tex": "g(A)=\\max(A-K,0),\\ A=\\frac{1}{n}\\sum S_t,\\ K=100.0",
+  "pricing_equation_tex": "",
+  "figure_path": "C:\\Users\\Lenovo\\Desktop\\Desktop\\Mestrado FGV\\derivx\\precificador\\tests\\report\\_artifacts\\asian_mc.png"
+}

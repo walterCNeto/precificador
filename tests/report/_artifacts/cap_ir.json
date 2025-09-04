@@ -1,0 +1,49 @@
+{
+  "price": 0.02072838335158475,
+  "se": 0.0,
+  "inputs": {
+    "engine": "analytic",
+    "S0": [],
+    "grid": {
+      "T": 2.0,
+      "steps": null,
+      "NS": null,
+      "NT": null,
+      "Smax_mult": null,
+      "alpha": null,
+      "N": null,
+      "eta": null
+    },
+    "model": {
+      "name": null,
+      "r": 0.05,
+      "q": null,
+      "sigma": null,
+      "corr": null,
+      "kappa": null,
+      "theta": null,
+      "xi": null,
+      "rho": null,
+      "v0": null
+    },
+    "product": {
+      "style": "european",
+      "type": "cap",
+      "payment_times": [
+        0.5,
+        1.0,
+        1.5,
+        2.0
+      ],
+      "tau": 0.5,
+      "K": 0.04,
+      "sigma": 0.2,
+      "notional": 1.0
+    },
+    "n_paths": null,
+    "seed": null
+  },
+  "payoff_equation_tex": "",
+  "pricing_equation_tex": "\\mathrm{Cap}=\\sum_i N\\,D(0,T_{i+1})\\,\\tau_i\\,(F_i\\Phi(d_1)-K\\Phi(d_2))",
+  "figure_path": "C:\\Users\\Lenovo\\Desktop\\Desktop\\Mestrado FGV\\derivx\\precificador\\tests\\report\\_artifacts\\cap_ir.png"
+}

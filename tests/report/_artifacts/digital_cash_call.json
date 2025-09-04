@@ -1,0 +1,52 @@
+{
+  "price": 0.5323248154537634,
+  "se": 0.0,
+  "inputs": {
+    "engine": "analytic",
+    "S0": [
+      100.0
+    ],
+    "grid": {
+      "T": 1.0,
+      "steps": null,
+      "NS": null,
+      "NT": null,
+      "Smax_mult": null,
+      "alpha": null,
+      "N": null,
+      "eta": null
+    },
+    "model": {
+      "name": null,
+      "r": 0.05,
+      "q": [
+        0.0
+      ],
+      "sigma": [
+        0.2
+      ],
+      "corr": [
+        [
+          1.0
+        ]
+      ],
+      "kappa": null,
+      "theta": null,
+      "xi": null,
+      "rho": null,
+      "v0": null
+    },
+    "product": {
+      "style": "european",
+      "type": "cash_or_nothing_call",
+      "asset": 0,
+      "K": 100.0,
+      "cash": 1.0
+    },
+    "n_paths": null,
+    "seed": null
+  },
+  "payoff_equation_tex": "g(S)=\\mathbf{1}_{S>K}\\cdot 1.0,\\ K=100.0",
+  "pricing_equation_tex": "\\mathrm{Haug}:~V=C\\,e^{-rT}\\Phi(d_2)",
+  "figure_path": "C:\\Users\\Lenovo\\Desktop\\Desktop\\Mestrado FGV\\derivx\\precificador\\tests\\report\\_artifacts\\digital_cash_call.png"
+}

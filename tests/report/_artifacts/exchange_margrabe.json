@@ -1,0 +1,59 @@
+{
+  "price": 4.6651669933572,
+  "se": 0.0,
+  "inputs": {
+    "engine": "analytic",
+    "S0": [
+      100.0,
+      120.0
+    ],
+    "grid": {
+      "T": 1.0,
+      "steps": null,
+      "NS": null,
+      "NT": null,
+      "Smax_mult": null,
+      "alpha": null,
+      "N": null,
+      "eta": null
+    },
+    "model": {
+      "name": null,
+      "r": 0.05,
+      "q": [
+        0.01,
+        0.03
+      ],
+      "sigma": [
+        0.2,
+        0.3
+      ],
+      "corr": [
+        [
+          1.0,
+          0.5
+        ],
+        [
+          0.5,
+          1.0
+        ]
+      ],
+      "kappa": null,
+      "theta": null,
+      "xi": null,
+      "rho": null,
+      "v0": null
+    },
+    "product": {
+      "style": "european",
+      "type": "exchange_call",
+      "asset_long": 0,
+      "asset_short": 1
+    },
+    "n_paths": null,
+    "seed": null
+  },
+  "payoff_equation_tex": "g(S_1,S_2)=\\max(S_1-S_2,0)",
+  "pricing_equation_tex": "\\mathrm{Margrabe}:~V=S_{1,0}e^{-q_1T}\\Phi(d_1)-S_{2,0}e^{-q_2T}\\Phi(d_2)",
+  "figure_path": "C:\\Users\\Lenovo\\Desktop\\Desktop\\Mestrado FGV\\derivx\\precificador\\tests\\report\\_artifacts\\exchange_margrabe.png"
+}
