@@ -1,27 +1,27 @@
-\contentsline {section}{\numberline {1}Instalação e \emph {quick start}}{1}{section.1}%
-\contentsline {paragraph}{Exemplo mínimo (via DSL).}{1}{lstlisting.-1}%
-\contentsline {section}{\numberline {2}Arquitetura (visão geral)}{1}{section.2}%
+\contentsline {section}{\numberline {1}Instalação e \emph {quick start}}{2}{section.1}%
+\contentsline {paragraph}{Exemplo mínimo (via DSL).}{2}{lstlisting.-1}%
+\contentsline {section}{\numberline {2}Arquitetura (visão geral)}{2}{section.2}%
 \contentsline {section}{\numberline {3}Base teórica}{2}{section.3}%
 \contentsline {subsection}{\numberline {3.1}Precificação sob $\mathbb {Q}$ e numeraire}{2}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}GBM multiativo e simulação exata}{2}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}LSMC (Longstaff--Schwartz)}{2}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.2}GBM multiativo e simulação exata}{3}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}LSMC (Longstaff--Schwartz)}{3}{subsection.3.3}%
 \contentsline {subsection}{\numberline {3.4}PDE 1D Crank--Nicolson (vanillas)}{3}{subsection.3.4}%
 \contentsline {subsection}{\numberline {3.5}FFT (Heston europeu)}{3}{subsection.3.5}%
-\contentsline {section}{\numberline {4}Como usar a biblioteca}{3}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Camada 1 — API direta (curvas, modelos, motores)}{3}{subsection.4.1}%
+\contentsline {section}{\numberline {4}Como usar a biblioteca}{4}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Camada 1 — API direta (curvas, modelos, motores)}{4}{subsection.4.1}%
 \contentsline {paragraph}{Exercício via LSMC.}{4}{lstlisting.-3}%
 \contentsline {subsection}{\numberline {4.2}Camada 2 — DSL declarativa (\texttt {price\_from\_spec})}{4}{subsection.4.2}%
-\contentsline {paragraph}{Chaves suportadas.}{4}{section*.4}%
+\contentsline {paragraph}{Chaves suportadas.}{5}{section*.4}%
 \contentsline {subsection}{\numberline {4.3}Precisão \& Performance: \emph {knobs} práticos}{5}{subsection.4.3}%
 \contentsline {section}{\numberline {5}Validação, testes e reprodutibilidade}{5}{section.5}%
-\contentsline {section}{\numberline {6}Exemplos práticos (fim-a-fim)}{5}{section.6}%
-\contentsline {subsection}{\numberline {6.1}(E1) Europeu: MC vs Black--Scholes}{5}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}(E2) PDE: put europeu vs americano}{5}{subsection.6.2}%
+\contentsline {section}{\numberline {6}Exemplos práticos (fim-a-fim)}{6}{section.6}%
+\contentsline {subsection}{\numberline {6.1}(E1) Europeu: MC vs Black--Scholes}{6}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}(E2) PDE: put europeu vs americano}{6}{subsection.6.2}%
 \contentsline {subsection}{\numberline {6.3}(E3) Barreira up\&out e monotonia}{6}{subsection.6.3}%
 \contentsline {subsection}{\numberline {6.4}(E4) Asiática aritmética $\le $ vanilla}{6}{subsection.6.4}%
-\contentsline {subsection}{\numberline {6.5}(E5) Bermudana (LSMC): frequência de exercício}{6}{subsection.6.5}%
-\contentsline {subsection}{\numberline {6.6}(E6) Heston: FFT vs MC}{6}{subsection.6.6}%
+\contentsline {subsection}{\numberline {6.5}(E5) Bermudana (LSMC): frequência de exercício}{7}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6}(E6) Heston: FFT vs MC}{7}{subsection.6.6}%
 \contentsline {subsection}{\numberline {6.7}(E7) Basket 2D (GBM correlacionado)}{7}{subsection.6.7}%
 \contentsline {subsection}{\numberline {6.8}(E8) Greeks por \emph {bump \& revalue} (CRN)}{7}{subsection.6.8}%
-\contentsline {section}{\numberline {7}Estrutura do repositório (resumo)}{7}{section.7}%
+\contentsline {section}{\numberline {7}Estrutura do repositório (resumo)}{8}{section.7}%
 \contentsline {section}{\numberline {8}Licença e aviso}{8}{section.8}%
