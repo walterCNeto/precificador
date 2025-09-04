@@ -44,3 +44,25 @@ python -m venv .venv
 pip install -e ".[dev]"
 $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD = "1"
 python -m pytest -q
+
+**macOS / Linux (bash/zsh):**
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
+
+## Hello, World (Quick Start)
+
+from derivx import price_from_spec, bs_call_price
+
+spec = {
+  "engine": "mc",
+  "model": {"name":"gbm","r":0.05,"q":0.0,"sigma":0.2},
+  "grid": {"T": 1.0, "steps": 128},
+  "S0": [100.0],
+  "product": {"style":"european","type":"european_call","asset":0,"K":100.0},
+  "n_paths": 80_000, "seed": 42,
+}
+p, se = price_from_spec(spec)
+print("MC:", p, "±", 1.96*se)
+print("BS:", bs_call_price(100, 100, r=0.05, q=0.0, sigma=0.2, T=1.0))
