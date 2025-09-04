@@ -1,11 +1,31 @@
 name: CI
 on: [push, pull_request]
+
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # Variáveis de ambiente válidas para todos os steps do job
+    env:
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+      MPLBACKEND: Agg  # backend headless do matplotlib
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - run: pip install -e ".[dev]"
-      - run: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q
+        with:
+          python-version: "3.11"
+
+      - name: Upgrade pip/setuptools/wheel
+        run: python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install package (dev extras)
+        run: pip install -e ".[dev]"
+
+      # (Opcional: só use se ainda não colocou matplotlib nos extras de dev)
+      # - name: Ensure matplotlib in CI
+      #   run: pip install "matplotlib>=3.8"
+
+      - name: Run tests
+        run: python -m pytest -q
