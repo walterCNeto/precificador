@@ -7,7 +7,7 @@
 - **Modelo sob Q** (GBM multiativo com correlação; `r(t)`, `q_i(t)`, `σ_i(t)`)
 - **Numerário** piecewise-flat (desconto determinístico exato por trechos)
 - **Payoffs PF** (funcionais de trajetória): terminal, média, máx/mín, basket, barreira…
-- **Exercício** Europeu, Bermudano, Americano (LSMC robusto)
+- **Exercício** Européias, Bermudas, Americanas (LSMC robusto)
 - **PDE 1D** (Crank–Nicolson) para vanillas (inclui Americano via projeção)
 - **FFT (Heston)** para europeias (Carr–Madan)
 - **Analítico (Haug/Margrabe)**: Digitais, Gap, Exchange
